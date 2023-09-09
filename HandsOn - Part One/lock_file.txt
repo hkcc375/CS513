@@ -1,0 +1,2 @@
+This file is for performing read as well as write operations for the programs 16a.c and 16b.c
+
