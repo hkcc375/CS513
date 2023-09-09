@@ -1,7 +1,7 @@
 # CS513
 All programs done as part of the course CS513 - Software Systems.
 
-Q1.) 1. Create the following types of a files using (i) shell command (ii) system call 
+Q1.) Create the following types of a files using (i) shell command (ii) system call 
         a. soft link (symlink system call)
         b. hard link (link system call)
         c. FIFO (mkfifo Library Function or mknod system call)
