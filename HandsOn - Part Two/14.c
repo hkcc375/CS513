@@ -7,15 +7,15 @@ int main( int argc, char const *argv[] )
 {
 	int fd[2];
 	char buffer[128];
-	int i;
-	if( !( i = pipe( fd ) ) )
+	int retVal = pipe( fd );
+	if( !retVal )
 	{
 		printf( "The pipe was created successfully. \n" );
 		sprintf( buffer, "Test Message - Works Correctly.\n" );
-		int j = write( fd[1], buffer, sizeof( buffer ) );
+		int i = write( fd[1], buffer, sizeof( buffer ) );
+		assert( i >= 0 );
+		int j = read( fd[0], buffer, sizeof( buffer ) );
 		assert( j >= 0 );
-		int k = read( fd[0], buffer, sizeof( buffer ) );
-		assert( k >= 0 );
 		printf( "Message from the read-end of the pipe "
 		        ": %s",
 		        buffer );
