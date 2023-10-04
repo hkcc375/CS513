@@ -19,7 +19,7 @@ int main( int argc, char* argv[] )
 		printf( "FIFO file was successfully opened in READ mode. \n" );
 		int i = read( fileDescriptor, buffer, sizeof( buffer ) );
 		assert( i >= 0 );
-		printf( "Message from the read end of FIFO : %s", buffer );
+		printf( "Message from the read end of FIFO : %s. \n", buffer );
 	}
 	return 0;
 }
