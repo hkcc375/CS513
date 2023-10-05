@@ -18,10 +18,10 @@ int main( int argc, char* argv[] )
 	else
 	{
 		fileName = argv[1];
-		fd_set writefds;
+		fd_set readfds;
 		struct timeval tv;
 
-		fileDescriptor = open( fileName, O_NONBLOCK | O_WRONLY );
+		fileDescriptor = open( fileName, O_RDONLY );
 		if( fileDescriptor < 0 ) perror( "Error : " );
 		printf( "File Descriptor value is : %d.\n", fileDescriptor );
 		int nfds = fileDescriptor + 1;
@@ -29,24 +29,27 @@ int main( int argc, char* argv[] )
 		tv.tv_sec  = 10;
 		tv.tv_usec = 0;
 
-		FD_ZERO( &writefds );
-		FD_SET( fileDescriptor, &writefds );
+		FD_ZERO( &readfds );
+		FD_SET( fileDescriptor, &readfds );
 
-		scanf( "%[^\n]", buffer );
-		int i = write( fileDescriptor, buffer, sizeof( buffer ) );
-		assert( i >= 0 );
-
-		int retval = select( nfds, NULL, &writefds, NULL, &tv );
+		int retval = select( nfds, &readfds, NULL, NULL, &tv );
 		if( retval == 0 )
-			printf( "Data was not written into FIFO within 10 "
+			printf( "Data was not read from FIFO within 10 "
 			        "seconds. \n" );
 		else if( retval == -1 )
 			perror( "Error : Either we've used a bad file "
 			        "descriptor OR an "
 			        "interrupt occured. \n" );
 		else
-			printf( "Data was written into FIFO within 10 seconds. "
-			        "\n" );
+		{
+			int i =
+			    read( fileDescriptor, buffer, sizeof( buffer ) );
+			assert( i >= 0 );
+			printf( "Data was read from FIFO file. \n" );
+			printf( "Output on the read end of FIFO : %s. \n",
+			        buffer );
+			close( fileDescriptor );
+		}
 	}
 	return 0;
 }
