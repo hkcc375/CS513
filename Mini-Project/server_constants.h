@@ -1,6 +1,18 @@
 #ifndef SERVER_CONSTANTS
 #define SERVER_CONSTANTS
 
+#define MAX_STUDENTS 500
+#define MAX_FACULTY 50
+#define MAX_COURSES 100
+
+#define STUDENT_NAME_LENGTH 32
+#define DEPARTMENT_NAME_LENGTH 32
+#define DESIGNATION_LENGTH 32
+#define EMAIL_LENGTH 64
+#define ADDRESS_LENGTH 128
+#define USERNAME_LENGTH 16
+#define PASSWORD_LENGTH 32
+
 #define INITIAL_PROMPT                                                         \
 	".................... Welcome Back to Academia Portal :: Course "      \
 	"Registration ....................\nLogin Type : Enter your choice { " \
