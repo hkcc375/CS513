@@ -1,7 +1,7 @@
 #ifndef STUDENT_H
 #define STUDENT_H
 
-struct Student
+struct student
 {
 	char* name;
 	int age;
@@ -10,6 +10,6 @@ struct Student
 	char* username;
 	char* password;
 	int status;
-} Student;
+} student;
 
 #endif

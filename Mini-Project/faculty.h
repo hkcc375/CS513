@@ -3,7 +3,7 @@
 
 #include "course.h"
 
-struct Faculty
+struct faculty
 {
 	char* name;
 	char* department;
@@ -13,6 +13,6 @@ struct Faculty
 	char* username;
 	char* password;
 	struct course* course_offered;
-} Faculty;
+} faculty;
 
 #endif

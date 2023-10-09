@@ -3,8 +3,8 @@
 
 struct course
 {
-	char courseid[8];
-	char department[32];
+	char* course_id;
+	char* department;
 	int credits;
 	int total_number_of_seats;
 	int number_of_available_seats;

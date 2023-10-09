@@ -12,6 +12,11 @@
 #define ADDRESS_LENGTH 128
 #define USERNAME_LENGTH 16
 #define PASSWORD_LENGTH 32
+#define COURSEID_LENGTH 8
+
+extern int no_of_students;
+extern int no_of_faculty;
+extern int no_of_courses;
 
 #define INITIAL_PROMPT                                                         \
 	".................... Welcome Back to Academia Portal :: Course "      \
