@@ -1,7 +1,7 @@
 #ifndef ADMIN_H
 #define ADMIN_H
 
-extern int admin_id;
-extern int admin_password;
+extern char* admin_id;
+extern char* admin_password;
 
 #endif

@@ -2,7 +2,6 @@
 #define SOCKET_CONSTANTS_H
 
 // Socket Programming Constants
-#define INPUT_MESSAGE "Input message (q or Q to exit) : "
 #define NEW_CLIENT "New client connected to server. \n"
 #define CLIENT_CONNECTED "\nConnection successful...\n"
 #define SOCKET_ERROR "socket() error. \n"
@@ -17,10 +16,16 @@
 #define SERVER_FILE_USAGE "Usage : ./server <port-no> \n"
 
 // Reaping Child Process Constants
-#define WAITPID_UNSUCCESSFUL "Waitpid was unsuccessful. \n"
-#define WAITPID_STATUSNOTAVAILABLE                                             \
+#define PROCESS_REAPED_UNSUCCESSFUL "Waitpid was unsuccessful. \n"
+#define PROCESS_STATUS_NOTAVAILABLE                                            \
 	"There was at least one child whose status information could not be "  \
 	"obtained. \n"
-#define PROCESS_REAPED_SUCCESS "Child Process was successfully reaped. \n"
+#define PROCESS_REAPED_SUCCESSFUL "Child Process was successfully reaped. \n"
+#define WRITE_UNSUCCESSFUL "Error while sending prompt to the client. \n"
+#define WRITE_SUCCESSFUL "Successfully sent prompt to the client. \n"
+#define READ_UNSUCCESSFUL "Server could not read the client choice. \n"
+#define READ_SUCCESSFUL                                                        \
+	"Server was successfully able to read the client choice. \n"
+#define READ_NOCHOICE "Client did not mention his choice. \n"
 
 #endif

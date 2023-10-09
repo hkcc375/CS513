@@ -7,11 +7,8 @@
 
 #include "socket_constants.h"
 
-#define BUFFER_SIZE 1024
-
 int main( int argc, char const* argv[] )
 {
-	char message[BUFFER_SIZE];
 	struct sockaddr_in serverAddress;
 
 	if( argc != 3 )
@@ -44,16 +41,16 @@ int main( int argc, char const* argv[] )
 
 		while( 1 )
 		{
-			write( 1, INPUT_MESSAGE, sizeof( INPUT_MESSAGE ) );
-			fgets( message, BUFFER_SIZE, stdin );
-			if( !strcmp( message, "q\n" ) ||
-			    !strcmp( message, "Q\n" ) )
-				break;
-			write( socketDescriptor, message, strlen( message ) );
+			char *read_buffer, *write_buffer;
+			read_buffer  = ( char* ) malloc( 512 * sizeof( char ) );
+			write_buffer = ( char* ) malloc( 512 * sizeof( char ) );
 			int str_len =
-			    read( socketDescriptor, message, BUFFER_SIZE - 1 );
-			message[str_len] = '\0';
-			printf( "Message from the server : %s", message );
+			    read( socketDescriptor, read_buffer, 512 );
+			read_buffer[str_len] = '\0';
+			printf( "%s\n", read_buffer );
+
+			free( read_buffer );
+			free( write_buffer );
 		}
 		close( socketDescriptor );
 	}
