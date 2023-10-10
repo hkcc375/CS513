@@ -111,12 +111,10 @@ int main( int argc, char const* argv[] )
 					write( 1, WRITE_SUCCESSFUL,
 					       sizeof( WRITE_SUCCESSFUL ) );
 
-					memset( &read_buffer, 0,
-					        sizeof( read_buffer ) );
+					memset( read_buffer, 0, 512 );
 
-					ssize_t read_bytes =
-					    read( clientSocket, read_buffer,
-					          sizeof( read_buffer ) );
+					ssize_t read_bytes = read(
+					    clientSocket, read_buffer, 512 );
 
 					if( read_bytes == -1 )
 					{
@@ -133,11 +131,10 @@ int main( int argc, char const* argv[] )
 					}
 					else
 					{
+						write( 1, read_buffer,
+						       strlen( read_buffer ) );
 						int userChoice =
 						    atoi( read_buffer );
-						printf(
-						    "User Choice is : %d \n",
-						    userChoice );
 					}
 				}
 				close( clientSocket );
