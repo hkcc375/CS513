@@ -6,8 +6,8 @@
 #include "admin.h"
 #include "server_constants.h"
 
-#define admin_id "admin"
-#define admin_password "1234"
+#define ADMIN_ID "admin"
+#define ADMIN_PASSWORD "1234"
 
 void admin_handler( int clientSocket )
 {
@@ -36,12 +36,12 @@ void admin_handler( int clientSocket )
 		write( 1, password_buffer, strlen( password_buffer ) );
 		password_buffer[read_password_bytes - 1] = '\0';
 
-		if( !strcmp( admin_id, username_buffer ) &&
-		    !( strcmp( admin_password, password_buffer ) ) )
+		if( !strcmp( ADMIN_ID, username_buffer ) &&
+		    !( strcmp( ADMIN_PASSWORD, password_buffer ) ) )
 		{
 			write( clientSocket, AUTHENTICATION_SUCCESS,
 			       sizeof( AUTHENTICATION_SUCCESS ) );
-
+			write( clientSocket, ADMIN_MENU, sizeof( ADMIN_MENU ) );
 			break;
 		}
 		else

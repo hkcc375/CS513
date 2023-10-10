@@ -7,11 +7,13 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include "admin.h"
+#include "faculty.h"
 #include "server_constants.h"
 #include "socket_constants.h"
+#include "student.h"
 
 void reap_child_process( int signal );
-void client_connection_handler( int clientSocket );
 
 void reap_child_process( int signal )
 {
@@ -135,6 +137,22 @@ int main( int argc, char const* argv[] )
 						       strlen( read_buffer ) );
 						int userChoice =
 						    atoi( read_buffer );
+						switch( userChoice )
+						{
+						case 1:
+							admin_handler(
+							    clientSocket );
+							break;
+						case 2:
+							faculty_handler(
+							    clientSocket );
+							break;
+						case 3:
+							student_handler(
+							    clientSocket );
+							break;
+						default: break;
+						}
 					}
 				}
 				close( clientSocket );

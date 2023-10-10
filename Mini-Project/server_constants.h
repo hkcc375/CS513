@@ -27,17 +27,17 @@ extern int no_of_courses;
 	".......... Welcome to Admin Menu ..........\n1. Add Student\n2. "     \
 	"View Student Details\n3. Add Faculty\n4. View Faculty Details\n5. "   \
 	"Activate Student\n6. Block Student\n7. Modify Student Details\n8. "   \
-	"Modify Faculty Details\n9. Logout and Exit"
+	"Modify Faculty Details\n9. Logout and Exit\n"
 
 #define FACULTY_MENU                                                           \
 	".......... Welcome to Faculty Menu ..........\n1. View Offering "     \
 	"Courses\n2. Add New Course\n3. Remove Course\n4. Update Course "      \
-	"Details\n5. Change Password\n6. Logout and Exit"
+	"Details\n5. Change Password\n6. Logout and Exit\n"
 
 #define STUDENT_MENU                                                           \
 	".......... Welcome to Student Menu ..........\n1. View All "          \
 	"Courses\n2. Enroll New Course\n3. Drop Course\n4. View Enrolled "     \
-	"Course Details\n5. Change Password\n6. Logout and Exit"
+	"Course Details\n5. Change Password\n6. Logout and Exit\n"
 
 #define LOGIN_MESSAGE "Enter your login id : "
 #define PASSWORD_MESSAGE "Enter your password : "
