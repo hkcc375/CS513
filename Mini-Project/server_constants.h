@@ -39,4 +39,10 @@ extern int no_of_courses;
 	"Courses\n2. Enroll New Course\n3. Drop Course\n4. View Enrolled "     \
 	"Course Details\n5. Change Password\n6. Logout and Exit"
 
+#define LOGIN_MESSAGE "Enter your login id : "
+#define PASSWORD_MESSAGE "Enter your password : "
+#define AUTHENTICATION_FAILED                                                  \
+	"Either your username or password is incorrect. \n"
+#define AUTHENTICATION_SUCCESS "Login was successful. \n"
+
 #endif

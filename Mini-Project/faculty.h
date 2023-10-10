@@ -15,4 +15,6 @@ struct faculty
 	struct course* course_offered;
 } faculty;
 
+void faculty_handler( int clientSocket );
+
 #endif

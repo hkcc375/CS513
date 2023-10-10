@@ -12,4 +12,6 @@ struct student
 	int status;
 } student;
 
+void student_handler( int clientSocket );
+
 #endif
