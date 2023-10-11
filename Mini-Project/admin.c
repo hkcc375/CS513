@@ -22,6 +22,7 @@ void admin_handler( int clientSocket )
 		memset( write_buffer, 0, 512 );
 		memset( username_buffer, 0, 16 );
 		memset( password_buffer, 0, 16 );
+		sleep( 1 );
 		write( clientSocket, LOGIN_MESSAGE, sizeof( LOGIN_MESSAGE ) );
 		int read_username_bytes =
 		    read( clientSocket, username_buffer, 16 );
@@ -39,13 +40,18 @@ void admin_handler( int clientSocket )
 		if( !strcmp( ADMIN_ID, username_buffer ) &&
 		    !( strcmp( ADMIN_PASSWORD, password_buffer ) ) )
 		{
+			free( username_buffer );
+			free( password_buffer );
 			write( clientSocket, AUTHENTICATION_SUCCESS,
 			       sizeof( AUTHENTICATION_SUCCESS ) );
+			sleep( 1 );
 			write( clientSocket, ADMIN_MENU, sizeof( ADMIN_MENU ) );
 			break;
 		}
 		else
+		{
 			write( clientSocket, AUTHENTICATION_FAILED,
 			       sizeof( AUTHENTICATION_FAILED ) );
+		}
 	}
 }

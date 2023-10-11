@@ -24,10 +24,10 @@ extern int no_of_courses;
 	"1. Admin 2.Faculty 3.Student }"
 
 #define ADMIN_MENU                                                             \
-	".......... Welcome to Admin Menu ..........\n1. Add Student\n2. "     \
+	"\n.......... Welcome to Admin Menu ..........\n1. Add Student\n2. "   \
 	"View Student Details\n3. Add Faculty\n4. View Faculty Details\n5. "   \
 	"Activate Student\n6. Block Student\n7. Modify Student Details\n8. "   \
-	"Modify Faculty Details\n9. Logout and Exit\n"
+	"Modify Faculty Details\n9. Logout and Exit\r\n\n"
 
 #define FACULTY_MENU                                                           \
 	".......... Welcome to Faculty Menu ..........\n1. View Offering "     \
@@ -39,8 +39,8 @@ extern int no_of_courses;
 	"Courses\n2. Enroll New Course\n3. Drop Course\n4. View Enrolled "     \
 	"Course Details\n5. Change Password\n6. Logout and Exit\n"
 
-#define LOGIN_MESSAGE "Enter your login id : "
-#define PASSWORD_MESSAGE "Enter your password : "
+#define LOGIN_MESSAGE "Enter your login id : \n"
+#define PASSWORD_MESSAGE "Enter your password : \n"
 #define AUTHENTICATION_FAILED                                                  \
 	"Either your username or password is incorrect. \n"
 #define AUTHENTICATION_SUCCESS "Login was successful. \n"

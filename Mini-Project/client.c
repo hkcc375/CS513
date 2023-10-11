@@ -36,11 +36,43 @@ void* receive_message( void* arg )
 	while( 1 )
 	{
 		memset( write_buffer, 0, 512 );
+		sleep( 1 );
 		str_len = read( socket, write_buffer, 512 );
-		if( str_len == -1 ) return ( void* ) -1;
+		if( str_len == -1 )
+		{
+			write( 1, "OUTPUT NOT COMING", 17 );
+			return ( void* ) -1;
+		}
 		write( 1, write_buffer, strlen( write_buffer ) );
 	}
 	return NULL;
+
+	// int socket = *( ( int* ) arg );
+	// char read_buffer[512];
+	// int str_len;
+	// while( 1 )
+	// {
+	// 	memset( read_buffer, 0, sizeof( read_buffer ) );
+	// 	str_len =
+	// 	    read( socket, read_buffer, sizeof( read_buffer ) - 1 );
+	// 	if( str_len <= 0 )
+	// 	{
+	// 		// Handle errors or disconnections here
+	// 		break;
+	// 	}
+	// 	read_buffer[str_len] = '\0'; // Null-terminate the received data
+
+	// 	// Split the received data into messages based on '\n'
+	// 	char* message = strtok( read_buffer, "\n" );
+	// 	while( message != NULL )
+	// 	{
+	// 		write( 1, message, strlen( message ) );
+	// 		write( 1, "\n",
+	// 		       1 ); // Print a newline after each message
+	// 		message = strtok( NULL, "\n" );
+	// 	}
+	// }
+	// return NULL;
 }
 
 int main( int argc, char const* argv[] )
