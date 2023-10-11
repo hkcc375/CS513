@@ -21,11 +21,20 @@
 	"There was at least one child whose status information could not be "  \
 	"obtained. \n"
 #define PROCESS_REAPED_SUCCESSFUL "Child Process was successfully reaped. \n"
+
 #define WRITE_UNSUCCESSFUL "Error while sending prompt to the client. \n"
 #define WRITE_SUCCESSFUL "Successfully sent prompt to the client. \n"
 #define READ_UNSUCCESSFUL "Server could not read the client choice. \n"
 #define READ_SUCCESSFUL                                                        \
 	"Server was successfully able to read the client choice. \n"
-#define READ_NOCHOICE "Client did not mention his choice. \n"
+#define READ_NO_CHOICE "Client did not mention his choice. \n"
+
+#define WRITE_ADMIN_PROMPT_SUCCESSFUL                                          \
+	"Successfully sent admin prompt to the client. \n"
+#define READ_ADMIN_CHOICE_SUCCESSFUL                                           \
+	"Server was successfully able to read the admin choice. \n"
+#define READ_ADMIN_CHOICE_UNSUCCESSFUL                                         \
+	"Server could not read the admin choice. \n"
+#define READ_ADMIN_NO_CHOICE "Admin did not mention his choice. \n"
 
 #endif

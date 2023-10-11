@@ -128,8 +128,8 @@ int main( int argc, char const* argv[] )
 					else if( read_bytes == 0 )
 					{
 						write(
-						    1, READ_NOCHOICE,
-						    sizeof( READ_NOCHOICE ) );
+						    1, READ_NO_CHOICE,
+						    sizeof( READ_NO_CHOICE ) );
 					}
 					else
 					{
@@ -140,15 +140,15 @@ int main( int argc, char const* argv[] )
 						switch( userChoice )
 						{
 						case 1:
-							admin_handler(
+							admin_connection_handler(
 							    clientSocket );
 							break;
 						case 2:
-							faculty_handler(
+							faculty_connection_handler(
 							    clientSocket );
 							break;
 						case 3:
-							student_handler(
+							student_connection_handler(
 							    clientSocket );
 							break;
 						default: break;

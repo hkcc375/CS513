@@ -45,4 +45,15 @@ extern int no_of_courses;
 	"Either your username or password is incorrect. \n"
 #define AUTHENTICATION_SUCCESS "Login was successful. \n"
 
+#define ENTER_STUDENT_NAME "Enter Student Name : \n"
+#define ENTER_STUDENT_EMAIL "Enter Student Email : \n"
+#define ENTER_STUDENT_AGE "Enter Student Age : \n"
+#define ENTER_STUDENT_ADDRESS "Enter Student Address : \n"
+#define CANNOT_ADD_STUDENTS                                                    \
+	"There are 500 students present. Cannot add any more students. \n"
+#define CANNOT_ADD_FACULTY                                                     \
+	"There are 50 faculty. Cannot add any more faculty. \n"
+#define CANNOT_ADD_COURSES                                                     \
+	"There are 100 courses. Cannot add any more courses. \n"
+
 #endif

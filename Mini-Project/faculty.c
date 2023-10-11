@@ -5,4 +5,4 @@
 
 #include "faculty.h"
 
-void faculty_handler( int clientSocket ) {}
+void faculty_connection_handler( int clientSocket ) {}

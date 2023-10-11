@@ -5,4 +5,4 @@
 
 #include "student.h"
 
-void student_handler( int clientSocket ) {}
+void student_connection_handler( int clientSocket ) {}

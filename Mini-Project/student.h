@@ -3,15 +3,16 @@
 
 struct student
 {
-	char* name;
+	char name[32];
 	int age;
-	char* email;
-	char* address;
-	char* username;
-	char* password;
-	int status;
+	char email[64];
+	char address[128];
+	char username[16];
+	int student_id;
+	char password[32];
+	int status; // 0 -> Inactive, 1 -> Active. By default, student is active
 } student;
 
-void student_handler( int clientSocket );
+void student_connection_handler( int clientSocket );
 
 #endif
