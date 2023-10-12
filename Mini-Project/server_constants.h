@@ -49,8 +49,16 @@ extern int no_of_courses;
 #define ENTER_STUDENT_EMAIL "Enter Student Email : \n"
 #define ENTER_STUDENT_AGE "Enter Student Age : \n"
 #define ENTER_STUDENT_ADDRESS "Enter Student Address : \n"
+#define ENTER_STUDENT_ID "Enter Student ID : \n"
+
 #define CANNOT_ADD_STUDENTS                                                    \
 	"There are 500 students present. Cannot add any more students. \n"
+#define STUDENT_CREATED_SUCCESSFULLY "\nStudent was created successfully. \n"
+#define STUDENT_RECORD_NOT_FOUND "The given student record was not found. \n"
+#define STUDENT_RECORD_INVALID "Student id entered was invalid. \n"
+#define STUDENT_RECORD_BLOCKED "Student was successfully blocked. \n"
+#define STUDENT_RECORD_ACTIVATED "Student was successfully activated. \n"
+
 #define CANNOT_ADD_FACULTY                                                     \
 	"There are 50 faculty. Cannot add any more faculty. \n"
 #define CANNOT_ADD_COURSES                                                     \

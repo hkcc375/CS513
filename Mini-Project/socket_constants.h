@@ -37,4 +37,16 @@
 	"Server could not read the admin choice. \n"
 #define READ_ADMIN_NO_CHOICE "Admin did not mention his choice. \n"
 
+#define STUDENT_RECORD_WRITE_FAILED "Write Student Record Failed. \n"
+#define STUDENT_RECORD_NOTHING_WRITTEN                                         \
+	"No Student Record was written to the file. \n"
+#define STUDENT_RECORD_WRITE_SUCCESSFUL                                        \
+	"Student Record was successfully written to the file. \n"
+#define STUDENT_FILE_OPEN_FAILED "Opening Student file failed. \n"
+#define STUDENT_FILE_EEXIST "Student file already exists. \n"
+#define STUDENT_RECORD_READ_FAILED "Read Student Record Failed. \n"
+#define STUDENT_RECORD_EOF "End of file reached while reading. \n"
+#define STUDENT_RECORD_READ_SUCCESSFUL                                         \
+	"Student Record was successfully read from the file. \n"
+
 #endif
