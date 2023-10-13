@@ -40,7 +40,8 @@ void* receive_message( void* arg )
 		str_len = read( socket, write_buffer, 512 );
 		if( str_len == -1 )
 		{
-			write( 1, "OUTPUT NOT COMING", 17 );
+			write( 1, CLIENT_SOCKET_CLOSED,
+			       sizeof( CLIENT_SOCKET_CLOSED ) );
 			return ( void* ) -1;
 		}
 		write( 1, write_buffer, strlen( write_buffer ) );

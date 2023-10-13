@@ -96,10 +96,8 @@ int main( int argc, char const* argv[] )
 				int str_len;
 
 				// Client Connection Handler
-				char *read_buffer, *write_buffer;
+				char* read_buffer;
 				read_buffer =
-				    ( char* ) malloc( 512 * sizeof( char ) );
-				write_buffer =
 				    ( char* ) malloc( 512 * sizeof( char ) );
 
 				ssize_t write_bytes =
@@ -155,11 +153,12 @@ int main( int argc, char const* argv[] )
 						}
 					}
 				}
+				write( clientSocket, DISCONNECTED_CLIENT,
+				       sizeof( DISCONNECTED_CLIENT ) );
 				close( clientSocket );
 				free( read_buffer );
-				free( write_buffer );
-				write( 1, CLIENT_DISCONNECTED,
-				       sizeof( CLIENT_DISCONNECTED ) );
+				write( 1, DISCONNECTED_SERVER,
+				       sizeof( DISCONNECTED_SERVER ) );
 				exit( 0 );
 			}
 			else // Parent Processs

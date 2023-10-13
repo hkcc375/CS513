@@ -58,6 +58,7 @@ extern int no_of_courses;
 #define STUDENT_RECORD_INVALID "Student id entered was invalid. \n"
 #define STUDENT_RECORD_BLOCKED "Student was successfully blocked. \n"
 #define STUDENT_RECORD_ACTIVATED "Student was successfully activated. \n"
+#define STUDENT_RECORD_MODIFIED "Student record was successfully modified. \n"
 
 #define CANNOT_ADD_FACULTY                                                     \
 	"There are 50 faculty. Cannot add any more faculty. \n"

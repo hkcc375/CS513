@@ -9,7 +9,9 @@
 #define LISTEN_ERROR "listen() error. \n"
 #define CONNECT_ERROR "connect() error. \n"
 #define FORK_FAILED "fork() failed. \n"
-#define CLIENT_DISCONNECTED "\nClient disconnected..."
+#define DISCONNECTED_SERVER "\nClient disconnected..."
+#define DISCONNECTED_CLIENT "\nYou have successfully logged out. \n"
+#define CLIENT_SOCKET_CLOSED "Client Socket is closed. \n"
 
 // Client File and Server File Usage Constants
 #define CLIENT_FILE_USAGE "Usage : ./client <ip-address> <port-no> \n"
@@ -31,11 +33,15 @@
 
 #define WRITE_ADMIN_PROMPT_SUCCESSFUL                                          \
 	"Successfully sent admin prompt to the client. \n"
-#define READ_ADMIN_CHOICE_SUCCESSFUL                                           \
-	"Server was successfully able to read the admin choice. \n"
 #define READ_ADMIN_CHOICE_UNSUCCESSFUL                                         \
 	"Server could not read the admin choice. \n"
-#define READ_ADMIN_NO_CHOICE "Admin did not mention his choice. \n"
+#define ADMIN_INCORRECT_CHOICE_SERVER                                          \
+	"Admin has mentioned a choice that does not fall within the given "    \
+	"range. \n"
+#define ADMIN_INCORRECT_CHOICE_CLIENT                                          \
+	"You have mentioned an incorrect choice. \n"
+#define ADMIN_NO_CHOICE_SERVER "Admin has not entered any choice. \n"
+#define ADMIN_NO_CHOICE_CLIENT "You have not entered any choice. \n"
 
 #define STUDENT_RECORD_WRITE_FAILED "Write Student Record Failed. \n"
 #define STUDENT_RECORD_NOTHING_WRITTEN                                         \
