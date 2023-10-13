@@ -1,13 +1,15 @@
 #ifndef SERVER_CONSTANTS
 #define SERVER_CONSTANTS
 
-#define MAX_STUDENTS 500
+#define MAX_STUDENTS 1000
 #define MAX_FACULTY 50
-#define MAX_COURSES 100
+#define MAX_COURSES 125
+#define MAX_COURSES_PER_FACULTY 5
+#define MAX_COURSES_PER_STUDENT 6
 
-#define STUDENT_NAME_LENGTH 32
-#define DEPARTMENT_NAME_LENGTH 32
-#define DESIGNATION_LENGTH 32
+#define NAME_LENGTH 32
+#define DEPARTMENT_NAME_LENGTH 64
+#define DESIGNATION_LENGTH 64
 #define EMAIL_LENGTH 64
 #define ADDRESS_LENGTH 128
 #define USERNAME_LENGTH 16
@@ -51,18 +53,40 @@ extern int no_of_courses;
 #define ENTER_STUDENT_ADDRESS "Enter Student Address : \n"
 #define ENTER_STUDENT_ID "Enter Student ID : \n"
 
-#define CANNOT_ADD_STUDENTS                                                    \
-	"There are 500 students present. Cannot add any more students. \n"
+#define ENTER_FACULTY_NAME "Enter Faculty Name : \n"
+#define ENTER_FACULTY_DEPARTMENT "Enter Faculty Department : \n"
+#define ENTER_FACULTY_DESIGNATION "Enter Faculty Designation : \n"
+#define ENTER_FACULTY_EMAIL "Enter Faculty Email : \n"
+#define ENTER_FACULTY_ADDRESS "Enter Faculty Address : \n"
+#define ENTER_FACULTY_ID "Enter Faculty ID : \n"
+
 #define STUDENT_CREATED_SUCCESSFULLY "\nStudent was created successfully. \n"
 #define STUDENT_RECORD_NOT_FOUND "The given student record was not found. \n"
-#define STUDENT_RECORD_INVALID "Student id entered was invalid. \n"
+#define STUDENT_RECORD_INVALID_CLIENT "Student id entered was invalid. \n"
+#define STUDENT_RECORD_INVALID_SERVER "Admin entered invalid student id. \n"
+
+#define STUDENT_ACTIVE "The given student is an active student. \n"
+#define STUDENT_INACTIVE "The given student is an inactive student. \n"
 #define STUDENT_RECORD_BLOCKED "Student was successfully blocked. \n"
 #define STUDENT_RECORD_ACTIVATED "Student was successfully activated. \n"
 #define STUDENT_RECORD_MODIFIED "Student record was successfully modified. \n"
 
+#define FACULTY_CREATED_SUCCESSFULLY "\nFaculty was created successfully. \n"
+#define FACULTY_RECORD_MODIFIED "Faculty record was successfully modified. \n"
+#define FACULTY_RECORD_INVALID_SERVER "Admin entered invalid faculty id. \n"
+#define FACULTY_RECORD_INVALID_CLIENT "Faculty id entered was invalid. \n"
+#define FACULTY_RECORD_NOT_FOUND "The given faculty record was not found. \n"
+
 #define CANNOT_ADD_FACULTY                                                     \
 	"There are 50 faculty. Cannot add any more faculty. \n"
 #define CANNOT_ADD_COURSES                                                     \
-	"There are 100 courses. Cannot add any more courses. \n"
+	"There are 125 courses. Cannot add any more courses. \n"
+#define CANNOT_ADD_STUDENTS                                                    \
+	"There are 1000 students present. Cannot add any more students. \n"
+#define CANNOT_ENROLL_COURSE                                                   \
+	"A Student can enroll for at most 6 courses. Cannot perform Enroll "   \
+	"Course. \n"
+#define CANNOT_ADD_COURSE_FACULTY                                              \
+	"A faculty can offer only 5 courses. Cannot perform Add Course. \n"
 
 #endif

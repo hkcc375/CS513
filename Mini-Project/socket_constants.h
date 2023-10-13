@@ -49,10 +49,20 @@
 #define STUDENT_RECORD_WRITE_SUCCESSFUL                                        \
 	"Student Record was successfully written to the file. \n"
 #define STUDENT_FILE_OPEN_FAILED "Opening Student file failed. \n"
-#define STUDENT_FILE_EEXIST "Student file already exists. \n"
 #define STUDENT_RECORD_READ_FAILED "Read Student Record Failed. \n"
-#define STUDENT_RECORD_EOF "End of file reached while reading. \n"
+#define STUDENT_RECORD_EOF "End of student file reached while reading. \n"
 #define STUDENT_RECORD_READ_SUCCESSFUL                                         \
 	"Student Record was successfully read from the file. \n"
+
+#define FACULTY_RECORD_WRITE_FAILED "Write Faculty Record Failed. \n"
+#define FACULTY_RECORD_NOTHING_WRITTEN                                         \
+	"No Faculty Record was written to the file. \n"
+#define FACULTY_RECORD_WRITE_SUCCESSFUL                                        \
+	"Faculty Record was successfully written to the file. \n"
+#define FACULTY_FILE_OPEN_FAILED "Opening Faculty file failed. \n"
+#define FACULTY_RECORD_READ_FAILED "Read Faculty Record Failed. \n"
+#define FACULTY_RECORD_EOF "End of Faculty file reached while reading. \n"
+#define FACULTY_RECORD_READ_SUCCESSFUL                                         \
+	"Faculty Record was successfully read from the file. \n"
 
 #endif

@@ -7,8 +7,8 @@
 
 int read_student_record( int fileDescriptor, struct student* record,
                          int record_indx, int record_size );
-void read_faculty_record( int fileDescriptor, struct faculty* record,
-                          int record_indx, int record_size );
+int read_faculty_record( int fileDescriptor, struct faculty* record,
+                         int record_indx, int record_size );
 
 void write_student_record( int fileDescriptor, struct student* record,
                            int record_indx, int record_size, int flag );

@@ -15,9 +15,341 @@
 int no_of_students = 0;
 int no_of_faculty  = 0;
 
-void add_faculty( int clientSocket ) {}
-void view_faculty_details( int clientSocket ) {}
-void modify_faculty_details( int clientSocket ) {}
+void modify_faculty_details( int clientSocket )
+{
+	struct faculty record;
+	char* read_buffer;
+	read_buffer = ( char* ) malloc( 512 * sizeof( char ) );
+	memset( read_buffer, 0, 512 );
+
+	int fileDescriptor = open( "faculty.txt", O_CREAT | O_RDWR, 0777 );
+	if( fileDescriptor == -1 )
+		perror( FACULTY_FILE_OPEN_FAILED );
+	else
+	{
+		write( clientSocket, ENTER_FACULTY_ID,
+		       sizeof( ENTER_FACULTY_ID ) );
+		sleep( 1 );
+		int read_faculty_id_bytes =
+		    read( clientSocket, read_buffer, 512 );
+		if( read_faculty_id_bytes == -1 )
+			perror( "Reading from socket failed. \n" );
+		read_buffer[read_faculty_id_bytes - 1] = '\0';
+		int faculty_id                         = atoi( read_buffer );
+		if( faculty_id == 0 )
+		{
+			write( 1, FACULTY_RECORD_INVALID_SERVER,
+			       sizeof( FACULTY_RECORD_INVALID_SERVER ) );
+			write( clientSocket, FACULTY_RECORD_INVALID_CLIENT,
+			       sizeof( FACULTY_RECORD_INVALID_CLIENT ) );
+		}
+		else
+		{
+			int retval = read_faculty_record(
+			    fileDescriptor, &record, faculty_id,
+			    sizeof( struct student ) );
+			if( retval == 1 )
+			{
+				memset( read_buffer, 0, 512 );
+
+				// Name
+				write( clientSocket, ENTER_FACULTY_NAME,
+				       sizeof( ENTER_FACULTY_NAME ) );
+				sleep( 1 );
+				int read_name_bytes =
+				    read( clientSocket, read_buffer, 512 );
+				if( read_name_bytes == -1 )
+					perror(
+					    "Could not read faculty name." );
+				read_buffer[read_name_bytes - 1] = '\0';
+				memset( record.name, 0, NAME_LENGTH );
+				strcpy( record.name, read_buffer );
+				memset( read_buffer, 0, 512 );
+
+				// Department
+				write( clientSocket, ENTER_FACULTY_DEPARTMENT,
+				       sizeof( ENTER_FACULTY_DEPARTMENT ) );
+				sleep( 1 );
+				int read_department_bytes =
+				    read( clientSocket, read_buffer, 512 );
+				if( read_department_bytes == -1 )
+					perror( "Could not read faculty "
+					        "department." );
+				read_buffer[read_department_bytes - 1] = '\0';
+				memset( record.department, 0,
+				        DEPARTMENT_NAME_LENGTH );
+				strcpy( record.department, read_buffer );
+				memset( read_buffer, 0, 512 );
+
+				// Designation
+				write( clientSocket, ENTER_FACULTY_DESIGNATION,
+				       sizeof( ENTER_FACULTY_DESIGNATION ) );
+				sleep( 1 );
+				int read_designation_bytes =
+				    read( clientSocket, read_buffer, 512 );
+				if( read_designation_bytes == -1 )
+					perror( "Could not read faculty "
+					        "designation." );
+				read_buffer[read_designation_bytes - 1] = '\0';
+				memset( record.designation, 0,
+				        DESIGNATION_LENGTH );
+				strcpy( record.designation, read_buffer );
+				memset( read_buffer, 0, 512 );
+
+				// Email
+				write( clientSocket, ENTER_FACULTY_EMAIL,
+				       sizeof( ENTER_FACULTY_EMAIL ) );
+				sleep( 1 );
+				int read_email_bytes =
+				    read( clientSocket, read_buffer, 512 );
+				if( read_email_bytes == -1 )
+					perror(
+					    "Could not read faculty email." );
+				read_buffer[read_email_bytes - 1] = '\0';
+				memset( record.email, 0, EMAIL_LENGTH );
+				strcpy( record.email, read_buffer );
+				memset( read_buffer, 0, 512 );
+
+				// Address
+				write( clientSocket, ENTER_FACULTY_ADDRESS,
+				       sizeof( ENTER_FACULTY_ADDRESS ) );
+				sleep( 1 );
+				int read_address_bytes =
+				    read( clientSocket, read_buffer, 512 );
+				if( read_address_bytes == -1 )
+					perror( "Could not read faculty "
+					        "addsress." );
+				read_buffer[read_address_bytes - 1] = '\0';
+				memset( record.address, 0, ADDRESS_LENGTH );
+				strcpy( record.address, read_buffer );
+				memset( read_buffer, 0, 512 );
+
+				write_faculty_record( fileDescriptor, &record,
+				                      faculty_id,
+				                      sizeof( faculty ), 1 );
+				write( clientSocket, FACULTY_RECORD_MODIFIED,
+				       sizeof( FACULTY_RECORD_MODIFIED ) );
+			}
+			else
+			{
+				write( clientSocket, FACULTY_RECORD_NOT_FOUND,
+				       sizeof( FACULTY_RECORD_NOT_FOUND ) );
+			}
+		}
+	}
+	close( fileDescriptor );
+	free( read_buffer );
+}
+
+void view_faculty_details( int clientSocket )
+{
+	struct faculty record;
+	char* read_buffer;
+	read_buffer = ( char* ) malloc( 512 * sizeof( char ) );
+	memset( read_buffer, 0, 512 );
+
+	int fileDescriptor = open( "faculty.txt", O_CREAT | O_RDONLY, 0777 );
+	if( fileDescriptor == -1 )
+		perror( FACULTY_FILE_OPEN_FAILED );
+	else
+	{
+		write( clientSocket, ENTER_FACULTY_ID,
+		       sizeof( ENTER_FACULTY_ID ) );
+		sleep( 1 );
+		int read_faculty_id_bytes =
+		    read( clientSocket, read_buffer, 512 );
+		if( read_faculty_id_bytes == -1 )
+			perror( "Reading from socket failed. \n" );
+		read_buffer[read_faculty_id_bytes - 1] = '\0';
+		int faculty_id                         = atoi( read_buffer );
+		if( faculty_id == 0 )
+		{
+			write( 1, FACULTY_RECORD_INVALID_SERVER,
+			       sizeof( FACULTY_RECORD_INVALID_SERVER ) );
+			write( clientSocket, FACULTY_RECORD_INVALID_CLIENT,
+			       sizeof( FACULTY_RECORD_INVALID_CLIENT ) );
+		}
+		else
+		{
+			int retval = read_faculty_record(
+			    fileDescriptor, &record, faculty_id,
+			    sizeof( struct faculty ) );
+			if( retval == 1 )
+			{
+				memset( read_buffer, 0, 512 );
+
+				// Name
+				strcat( read_buffer, "Name : " );
+				strcat( read_buffer, record.name );
+				strcat( read_buffer, "\n" );
+				write( clientSocket, read_buffer,
+				       strlen( read_buffer ) );
+				memset( read_buffer, 0, 512 );
+
+				// Department
+				strcat( read_buffer, "Department : " );
+				strcat( read_buffer, record.department );
+				strcat( read_buffer, "\n" );
+				write( clientSocket, read_buffer,
+				       strlen( read_buffer ) );
+				memset( read_buffer, 0, 512 );
+
+				// Designation
+				strcat( read_buffer, "Designation : " );
+				strcat( read_buffer, record.designation );
+				strcat( read_buffer, "\n" );
+				write( clientSocket, read_buffer,
+				       strlen( read_buffer ) );
+				memset( read_buffer, 0, 512 );
+
+				// Email
+				strcat( read_buffer, "Email : " );
+				strcat( read_buffer, record.email );
+				strcat( read_buffer, "\n" );
+				write( clientSocket, read_buffer,
+				       strlen( read_buffer ) );
+				memset( read_buffer, 0, 512 );
+
+				// Address
+				strcat( read_buffer, "Address : " );
+				strcat( read_buffer, record.address );
+				strcat( read_buffer, "\n" );
+				write( clientSocket, read_buffer,
+				       strlen( read_buffer ) );
+				memset( read_buffer, 0, 512 );
+
+				// Username
+				strcat( read_buffer, "Login id / Username : " );
+				strcat( read_buffer, record.username );
+				strcat( read_buffer, "\n" );
+				write( clientSocket, read_buffer,
+				       strlen( read_buffer ) );
+				memset( read_buffer, 0, 512 );
+			}
+			else
+			{
+				write( clientSocket, FACULTY_RECORD_NOT_FOUND,
+				       sizeof( FACULTY_RECORD_NOT_FOUND ) );
+			}
+		}
+	}
+	close( fileDescriptor );
+	free( read_buffer );
+}
+
+void add_faculty( int clientSocket )
+{
+	char* read_buffer;
+	read_buffer = ( char* ) malloc( 512 * sizeof( char ) );
+	memset( read_buffer, 0, 512 );
+
+	int fileDescriptor = open( "faculty.txt", O_CREAT | O_WRONLY, 0777 );
+	if( fileDescriptor == -1 )
+		perror( FACULTY_FILE_OPEN_FAILED );
+	else
+	{
+		if( no_of_faculty < MAX_FACULTY )
+		{
+			struct faculty new_faculty;
+
+			// Name
+			write( clientSocket, ENTER_FACULTY_NAME,
+			       sizeof( ENTER_FACULTY_NAME ) );
+			sleep( 1 );
+			int read_name_bytes =
+			    read( clientSocket, read_buffer, 512 );
+			if( read_name_bytes == -1 )
+				perror( "Could not read faculty name." );
+			read_buffer[read_name_bytes - 1] = '\0';
+			memset( new_faculty.name, 0, NAME_LENGTH );
+			strcpy( new_faculty.name, read_buffer );
+			memset( read_buffer, 0, 512 );
+
+			// Department
+			write( clientSocket, ENTER_FACULTY_DEPARTMENT,
+			       sizeof( ENTER_FACULTY_DEPARTMENT ) );
+			sleep( 1 );
+			int read_department_bytes =
+			    read( clientSocket, read_buffer, 512 );
+			if( read_department_bytes == -1 )
+				perror( "Could not read faculty department." );
+			read_buffer[read_department_bytes - 1] = '\0';
+			memset( new_faculty.department, 0,
+			        DEPARTMENT_NAME_LENGTH );
+			strcpy( new_faculty.department, read_buffer );
+			memset( read_buffer, 0, 512 );
+
+			// Designation
+			write( clientSocket, ENTER_FACULTY_DEPARTMENT,
+			       sizeof( ENTER_FACULTY_DEPARTMENT ) );
+			sleep( 1 );
+			int read_designation_bytes =
+			    read( clientSocket, read_buffer, 512 );
+			if( read_designation_bytes == -1 )
+				perror( "Could not read faculty designation." );
+			read_buffer[read_designation_bytes - 1] = '\0';
+			memset( new_faculty.designation, 0,
+			        DESIGNATION_LENGTH );
+			strcpy( new_faculty.designation, read_buffer );
+			memset( read_buffer, 0, 512 );
+
+			// Email
+			write( clientSocket, ENTER_FACULTY_EMAIL,
+			       sizeof( ENTER_FACULTY_EMAIL ) );
+			sleep( 1 );
+			int read_email_bytes =
+			    read( clientSocket, read_buffer, 512 );
+			if( read_email_bytes == -1 )
+				perror( "Could not read faculty email." );
+			read_buffer[read_email_bytes - 1] = '\0';
+			memset( new_faculty.email, 0, EMAIL_LENGTH );
+			strcpy( new_faculty.email, read_buffer );
+			memset( read_buffer, 0, 512 );
+
+			// Address
+			write( clientSocket, ENTER_FACULTY_ADDRESS,
+			       sizeof( ENTER_FACULTY_ADDRESS ) );
+			sleep( 1 );
+			int read_address_bytes =
+			    read( clientSocket, read_buffer, 512 );
+			if( read_address_bytes == -1 )
+				perror( "Could not read faculty address." );
+			read_buffer[read_address_bytes - 1] = '\0';
+			memset( new_faculty.address, 0, ADDRESS_LENGTH );
+			strcpy( new_faculty.address, read_buffer );
+			memset( read_buffer, 0, 512 );
+
+			// Memset the fields for course
+
+			// Password
+			strcpy( new_faculty.password, "faculty" );
+
+			// Student ID
+			// Apply Semaphores here... OR maintain the details in
+			// another file...
+			no_of_faculty++;
+			new_faculty.faculty_id = no_of_faculty;
+
+			// Username
+			memset( new_faculty.username, 0, USERNAME_LENGTH );
+			snprintf( new_faculty.username, USERNAME_LENGTH,
+			          "FY%03d", new_faculty.faculty_id );
+
+			write( clientSocket, FACULTY_CREATED_SUCCESSFULLY,
+			       sizeof( FACULTY_CREATED_SUCCESSFULLY ) );
+
+			write_faculty_record( fileDescriptor, &new_faculty, 0,
+			                      sizeof( faculty ), 0 );
+		}
+		else
+		{
+			write( clientSocket, CANNOT_ADD_FACULTY,
+			       sizeof( CANNOT_ADD_FACULTY ) );
+		}
+	}
+	free( read_buffer );
+	close( fileDescriptor );
+}
 
 void logout_and_exit( int clientSocket ) { return; }
 
@@ -44,8 +376,10 @@ void modify_student_details( int clientSocket )
 		int student_id                         = atoi( read_buffer );
 		if( student_id == 0 )
 		{
-			write( clientSocket, STUDENT_RECORD_INVALID,
-			       sizeof( STUDENT_RECORD_INVALID ) );
+			write( 1, STUDENT_RECORD_INVALID_SERVER,
+			       sizeof( STUDENT_RECORD_INVALID_SERVER ) );
+			write( clientSocket, STUDENT_RECORD_INVALID_CLIENT,
+			       sizeof( STUDENT_RECORD_INVALID_CLIENT ) );
 		}
 		else
 		{
@@ -69,7 +403,7 @@ void modify_student_details( int clientSocket )
 					perror(
 					    "Could not read student name." );
 				read_buffer[read_name_bytes - 1] = '\0';
-				memset( record.name, 0, STUDENT_NAME_LENGTH );
+				memset( record.name, 0, NAME_LENGTH );
 				strcpy( record.name, read_buffer );
 				// printf( "%s\n", new_student.name );
 				memset( read_buffer, 0, 512 );
@@ -155,8 +489,10 @@ void activate_student( int clientSocket )
 		int student_id                         = atoi( read_buffer );
 		if( student_id == 0 )
 		{
-			write( clientSocket, STUDENT_RECORD_INVALID,
-			       sizeof( STUDENT_RECORD_INVALID ) );
+			write( 1, STUDENT_RECORD_INVALID_SERVER,
+			       sizeof( STUDENT_RECORD_INVALID_SERVER ) );
+			write( clientSocket, STUDENT_RECORD_INVALID_CLIENT,
+			       sizeof( STUDENT_RECORD_INVALID_CLIENT ) );
 		}
 		else
 		{
@@ -211,8 +547,10 @@ void block_student( int clientSocket )
 		int student_id                         = atoi( read_buffer );
 		if( student_id == 0 )
 		{
-			write( clientSocket, STUDENT_RECORD_INVALID,
-			       sizeof( STUDENT_RECORD_INVALID ) );
+			write( 1, STUDENT_RECORD_INVALID_SERVER,
+			       sizeof( STUDENT_RECORD_INVALID_SERVER ) );
+			write( clientSocket, STUDENT_RECORD_INVALID_CLIENT,
+			       sizeof( STUDENT_RECORD_INVALID_CLIENT ) );
 		}
 		else
 		{
@@ -268,8 +606,10 @@ void view_student_details( int clientSocket )
 		if( student_id == 0 )
 		{
 			// write message on the server screen...
-			write( clientSocket, STUDENT_RECORD_INVALID,
-			       sizeof( STUDENT_RECORD_INVALID ) );
+			write( 1, STUDENT_RECORD_INVALID_SERVER,
+			       sizeof( STUDENT_RECORD_INVALID_SERVER ) );
+			write( clientSocket, STUDENT_RECORD_INVALID_CLIENT,
+			       sizeof( STUDENT_RECORD_INVALID_CLIENT ) );
 		}
 		else
 		{
@@ -322,6 +662,15 @@ void view_student_details( int clientSocket )
 				write( clientSocket, read_buffer,
 				       strlen( read_buffer ) );
 				memset( read_buffer, 0, 512 );
+
+				// Status
+				if( record.status == 1 )
+					strcat( read_buffer, STUDENT_ACTIVE );
+				else
+					strcat( read_buffer, STUDENT_INACTIVE );
+				write( clientSocket, read_buffer,
+				       strlen( read_buffer ) );
+				memset( read_buffer, 0, 512 );
 			}
 			else
 			{
@@ -358,7 +707,7 @@ void add_student( int clientSocket )
 			if( read_name_bytes == -1 )
 				perror( "Could not read student name." );
 			read_buffer[read_name_bytes - 1] = '\0';
-			memset( new_student.name, 0, STUDENT_NAME_LENGTH );
+			memset( new_student.name, 0, NAME_LENGTH );
 			strcpy( new_student.name, read_buffer );
 			// printf( "%s\n", new_student.name );
 			memset( read_buffer, 0, 512 );
@@ -401,6 +750,8 @@ void add_student( int clientSocket )
 			memset( new_student.address, 0, ADDRESS_LENGTH );
 			strcpy( new_student.address, read_buffer );
 			memset( read_buffer, 0, 512 );
+
+			// Memset the fields for course
 
 			// Password
 			strcpy( new_student.password, "student" );
