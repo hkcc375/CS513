@@ -14,6 +14,6 @@ void activate_student( int clientSocket );
 void block_student( int clientSocket );
 void modify_student_details( int clientSocket );
 void modify_faculty_details( int clientSocket );
-void logout_and_exit( int clientSocket );
+void logout_and_exit_admin();
 
 #endif

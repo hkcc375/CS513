@@ -14,7 +14,7 @@ admin.o: admin.c admin.h server_constants.h faculty.h socket_constants.h student
 student.o: student.c student.h
 	gcc -c student.c
 
-faculty.o: faculty.c faculty.h course.h
+faculty.o: faculty.c faculty.h course.h common.h server_constants.h socket_constants.h
 	gcc -c faculty.c
 
 common.o: common.c common.h socket_constants.h

@@ -24,6 +24,7 @@
 	"obtained. \n"
 #define PROCESS_REAPED_SUCCESSFUL "Child Process was successfully reaped. \n"
 
+// Reading Client Choice, Sending prompt to client
 #define WRITE_UNSUCCESSFUL "Error while sending prompt to the client. \n"
 #define WRITE_SUCCESSFUL "Successfully sent prompt to the client. \n"
 #define READ_UNSUCCESSFUL "Server could not read the client choice. \n"
@@ -31,6 +32,7 @@
 	"Server was successfully able to read the client choice. \n"
 #define READ_NO_CHOICE "Client did not mention his choice. \n"
 
+// Admin Part
 #define WRITE_ADMIN_PROMPT_SUCCESSFUL                                          \
 	"Successfully sent admin prompt to the client. \n"
 #define READ_ADMIN_CHOICE_UNSUCCESSFUL                                         \
@@ -43,6 +45,20 @@
 #define ADMIN_NO_CHOICE_SERVER "Admin has not entered any choice. \n"
 #define ADMIN_NO_CHOICE_CLIENT "You have not entered any choice. \n"
 
+// Faculty Part
+#define WRITE_FACULTY_PROMPT_SUCCESSFUL                                        \
+	"Successfully sent faculty prompt to the client. \n\n"
+#define READ_FACULTY_CHOICE_UNSUCCESSFUL                                       \
+	"Server could not read the faculty choice. \n"
+#define FACULTY_INCORRECT_CHOICE_SERVER                                        \
+	"Faculty has mentioned a choice that does not fall within the given "  \
+	"range. \n"
+#define FACULTY_INCORRECT_CHOICE_CLIENT                                        \
+	"You have mentioned an incorrect choice. \n"
+#define FACULTY_NO_CHOICE_SERVER "Faculty has not entered any choice. \n"
+#define FACULTY_NO_CHOICE_CLIENT "You have not entered any choice. \n"
+
+// Student Record - Read/Write
 #define STUDENT_RECORD_WRITE_FAILED "Write Student Record Failed. \n"
 #define STUDENT_RECORD_NOTHING_WRITTEN                                         \
 	"No Student Record was written to the file. \n"
@@ -54,6 +70,7 @@
 #define STUDENT_RECORD_READ_SUCCESSFUL                                         \
 	"Student Record was successfully read from the file. \n"
 
+// Faculty Record - Read/Write
 #define FACULTY_RECORD_WRITE_FAILED "Write Faculty Record Failed. \n"
 #define FACULTY_RECORD_NOTHING_WRITTEN                                         \
 	"No Faculty Record was written to the file. \n"
@@ -63,6 +80,6 @@
 #define FACULTY_RECORD_READ_FAILED "Read Faculty Record Failed. \n"
 #define FACULTY_RECORD_EOF "End of Faculty file reached while reading. \n"
 #define FACULTY_RECORD_READ_SUCCESSFUL                                         \
-	"Faculty Record was successfully read from the file. \n"
+	"\nFaculty Record was successfully read from the file. \n"
 
 #endif

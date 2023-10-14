@@ -47,7 +47,7 @@ void modify_faculty_details( int clientSocket )
 		{
 			int retval = read_faculty_record(
 			    fileDescriptor, &record, faculty_id,
-			    sizeof( struct student ) );
+			    sizeof( struct faculty ) );
 			if( retval == 1 )
 			{
 				memset( read_buffer, 0, 512 );
@@ -280,8 +280,8 @@ void add_faculty( int clientSocket )
 			memset( read_buffer, 0, 512 );
 
 			// Designation
-			write( clientSocket, ENTER_FACULTY_DEPARTMENT,
-			       sizeof( ENTER_FACULTY_DEPARTMENT ) );
+			write( clientSocket, ENTER_FACULTY_DESIGNATION,
+			       sizeof( ENTER_FACULTY_DESIGNATION ) );
 			sleep( 1 );
 			int read_designation_bytes =
 			    read( clientSocket, read_buffer, 512 );
@@ -351,7 +351,7 @@ void add_faculty( int clientSocket )
 	close( fileDescriptor );
 }
 
-void logout_and_exit( int clientSocket ) { return; }
+void logout_and_exit_admin() { return; }
 
 void modify_student_details( int clientSocket )
 {
@@ -835,7 +835,7 @@ void admin_menu_handler( int clientSocket )
 					modify_faculty_details( clientSocket );
 					break;
 				case 9:
-					logout_and_exit( clientSocket );
+					logout_and_exit_admin();
 					condition = 0;
 					break;
 				default:
