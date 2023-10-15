@@ -333,7 +333,7 @@ void add_faculty( int clientSocket )
 			// Username
 			memset( new_faculty.username, 0, USERNAME_LENGTH );
 			snprintf( new_faculty.username, USERNAME_LENGTH,
-			          "FY%03d", new_faculty.faculty_id );
+			          "FY%02d", new_faculty.faculty_id );
 
 			write( clientSocket, FACULTY_CREATED_SUCCESSFULLY,
 			       sizeof( FACULTY_CREATED_SUCCESSFULLY ) );
@@ -768,7 +768,7 @@ void add_student( int clientSocket )
 			// Username
 			memset( new_student.username, 0, USERNAME_LENGTH );
 			snprintf( new_student.username, USERNAME_LENGTH,
-			          "MT%03d", new_student.student_id );
+			          "MT%04d", new_student.student_id );
 
 			write( clientSocket, STUDENT_CREATED_SUCCESSFULLY,
 			       sizeof( STUDENT_CREATED_SUCCESSFULLY ) );
@@ -877,6 +877,7 @@ void admin_connection_handler( int clientSocket )
 		write( 1, username_buffer, strlen( username_buffer ) );
 		write( clientSocket, PASSWORD_MESSAGE,
 		       sizeof( PASSWORD_MESSAGE ) );
+
 		int read_password_bytes =
 		    read( clientSocket, password_buffer, 16 );
 

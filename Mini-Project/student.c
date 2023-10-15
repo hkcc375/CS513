@@ -204,7 +204,7 @@ void student_connection_handler( int clientSocket )
 			memset( temp_username_buffer, 0, USERNAME_LENGTH );
 			strcpy( temp_username_buffer,
 			        username_buffer + strlen( username_buffer ) -
-			            3 );
+			            4 );
 			student_id = atoi( temp_username_buffer );
 			free( temp_username_buffer );
 			if( student_id == 0 )
