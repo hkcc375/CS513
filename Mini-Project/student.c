@@ -63,10 +63,10 @@ void change_password_student( int clientSocket, int student_id )
 			             confirm_password_buffer ) &&
 			    retval == 1 )
 			{
-				write( clientSocket, PASSWORDS_MATCH,
-				       sizeof( PASSWORDS_MATCH ) );
-				write( 1, PASSWORDS_MATCH,
-				       sizeof( PASSWORDS_MATCH ) );
+				write( clientSocket, PASSWORDS_MATCH_CLIENT,
+				       sizeof( PASSWORDS_MATCH_CLIENT ) );
+				write( 1, PASSWORDS_MATCH_SERVER,
+				       sizeof( PASSWORDS_MATCH_SERVER ) );
 				sleep( 1 );
 				write( clientSocket, PASSWORDS_CHANGED_CLIENT,
 				       sizeof( PASSWORDS_CHANGED_CLIENT ) );
@@ -131,27 +131,26 @@ void student_menu_handler( int clientSocket, int student_id )
 				switch( userChoice )
 				{
 				case 1:
-					add_new_course( clientSocket,
-					                student_id );
-					break;
-				case 2:
-					view_offering_courses( clientSocket,
-					                       student_id );
-					break;
-				case 3:
-					remove_course_from_catalog(
-					    clientSocket, student_id );
-					break;
-				case 4:
-					update_course( clientSocket,
+					enroll_course( clientSocket,
 					               student_id );
 					break;
+				case 2:
+					drop_course( clientSocket, student_id );
+					break;
+				case 3:
+					view_all_courses( clientSocket,
+					                  student_id );
+					break;
+				case 4:
+					view_enrolled_courses( clientSocket,
+					                       student_id );
+					break;
 				case 5:
-					change_password_faculty( clientSocket,
+					change_password_student( clientSocket,
 					                         student_id );
 					break;
 				case 6:
-					logout_and_exit_faculty();
+					logout_and_exit_student();
 					condition = 0;
 					break;
 				default:
@@ -218,7 +217,7 @@ void student_connection_handler( int clientSocket )
 			{
 				int retval = read_student_record(
 				    fileDescriptor, &record, student_id,
-				    sizeof( struct faculty ) );
+				    sizeof( struct student ) );
 				if( retval == 1 )
 				{
 

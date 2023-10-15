@@ -63,10 +63,10 @@ void change_password_faculty( int clientSocket, int faculty_id )
 			             confirm_password_buffer ) &&
 			    retval == 1 )
 			{
-				write( clientSocket, PASSWORDS_MATCH,
-				       sizeof( PASSWORDS_MATCH ) );
-				write( 1, PASSWORDS_MATCH,
-				       sizeof( PASSWORDS_MATCH ) );
+				write( clientSocket, PASSWORDS_MATCH_CLIENT,
+				       sizeof( PASSWORDS_MATCH_CLIENT ) );
+				write( 1, PASSWORDS_MATCH_SERVER,
+				       sizeof( PASSWORDS_MATCH_SERVER ) );
 				sleep( 1 );
 				write( clientSocket, PASSWORDS_CHANGED_CLIENT,
 				       sizeof( PASSWORDS_CHANGED_CLIENT ) );

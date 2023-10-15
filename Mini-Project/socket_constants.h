@@ -81,7 +81,7 @@
 #define STUDENT_RECORD_READ_FAILED "Read Student Record Failed. \n"
 #define STUDENT_RECORD_EOF "End of student file reached while reading. \n"
 #define STUDENT_RECORD_READ_SUCCESSFUL                                         \
-	"Student Record was successfully read from the file. \n"
+	"\nStudent Record was successfully read from the file. \n"
 
 // Faculty Record - Read/Write
 #define FACULTY_RECORD_WRITE_FAILED "Write Faculty Record Failed. \n"
