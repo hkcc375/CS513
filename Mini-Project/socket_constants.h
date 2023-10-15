@@ -58,6 +58,19 @@
 #define FACULTY_NO_CHOICE_SERVER "Faculty has not entered any choice. \n"
 #define FACULTY_NO_CHOICE_CLIENT "You have not entered any choice. \n"
 
+// Student Part
+#define WRITE_STUDENT_PROMPT_SUCCESSFUL                                        \
+	"Successfully sent student prompt to the client. \n\n"
+#define READ_STUDENT_CHOICE_UNSUCCESSFUL                                       \
+	"Server could not read the student choice. \n"
+#define STUDENT_INCORRECT_CHOICE_SERVER                                        \
+	"Student has mentioned a choice that does not fall within the given "  \
+	"range. \n"
+#define STUDENT_INCORRECT_CHOICE_CLIENT                                        \
+	"You have mentioned an incorrect choice. \n"
+#define STUDENT_NO_CHOICE_SERVER "Student has not entered any choice. \n"
+#define STUDENT_NO_CHOICE_CLIENT "You have not entered any choice. \n"
+
 // Student Record - Read/Write
 #define STUDENT_RECORD_WRITE_FAILED "Write Student Record Failed. \n"
 #define STUDENT_RECORD_NOTHING_WRITTEN                                         \

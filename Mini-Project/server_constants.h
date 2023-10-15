@@ -64,12 +64,15 @@ extern int no_of_courses;
 #define ENTER_FACULTY_EMAIL "Enter Faculty Email : \n"
 #define ENTER_FACULTY_ADDRESS "Enter Faculty Address : \n"
 #define ENTER_FACULTY_ID "Enter Faculty ID : \n"
-#define ENTER_FACULTY_PASSWORD "\nEnter your new password : \n"
-#define ENTER_FACULTY_PASSWORD_CONFIRM "Please, confirm your new password : \n"
+
+// Password Change
+#define ENTER_PASSWORD "\nEnter your new password : \n"
+#define ENTER_PASSWORD_CONFIRM "Please, confirm your new password : \n"
 #define PASSWORDS_DO_NOT_MATCH "Passwords entered do not match. \n"
 #define PASSWORDS_MATCH "\nPasswords entered match. \n"
 #define PASSWORDS_CHANGED_CLIENT "Your password is now changed. \n"
-#define PASSWORDS_CHANGED_SERVER "Faculty password is now changed. \n"
+#define FACULTY_PASSWORDS_CHANGED_SERVER "Faculty password is now changed. \n"
+#define STUDENT_PASSWORDS_CHANGED_SERVER "Student password is now changed. \n"
 
 // Student Record Creation/Modification, Found/Not Found
 #define STUDENT_CREATED_SUCCESSFULLY "\nStudent was created successfully. \n"

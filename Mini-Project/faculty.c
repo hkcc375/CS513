@@ -15,7 +15,7 @@ void remove_course_from_catalog( int clientSocket, int faculty_id ) {}
 void update_course( int clientSocket, int faculty_id ) {}
 void view_offering_courses( int clientSocket, int faculty_id ) {}
 
-void change_password( int clientSocket, int faculty_id )
+void change_password_faculty( int clientSocket, int faculty_id )
 {
 	struct faculty record;
 	char *password_buffer, *confirm_password_buffer;
@@ -32,8 +32,8 @@ void change_password( int clientSocket, int faculty_id )
 	{
 		while( 1 )
 		{
-			write( clientSocket, ENTER_FACULTY_PASSWORD,
-			       sizeof( ENTER_FACULTY_PASSWORD ) );
+			write( clientSocket, ENTER_PASSWORD,
+			       sizeof( ENTER_PASSWORD ) );
 			sleep( 1 );
 			int read_faculty_password_bytes = read(
 			    clientSocket, password_buffer, PASSWORD_LENGTH );
@@ -42,8 +42,8 @@ void change_password( int clientSocket, int faculty_id )
 			password_buffer[read_faculty_password_bytes - 1] = '\0';
 			write( 1, password_buffer, strlen( password_buffer ) );
 
-			write( clientSocket, ENTER_FACULTY_PASSWORD_CONFIRM,
-			       sizeof( ENTER_FACULTY_PASSWORD_CONFIRM ) );
+			write( clientSocket, ENTER_PASSWORD_CONFIRM,
+			       sizeof( ENTER_PASSWORD_CONFIRM ) );
 			sleep( 1 );
 			int read_faculty_password_confirm_bytes =
 			    read( clientSocket, confirm_password_buffer,
@@ -70,8 +70,9 @@ void change_password( int clientSocket, int faculty_id )
 				sleep( 1 );
 				write( clientSocket, PASSWORDS_CHANGED_CLIENT,
 				       sizeof( PASSWORDS_CHANGED_CLIENT ) );
-				write( 1, PASSWORDS_CHANGED_SERVER,
-				       sizeof( PASSWORDS_CHANGED_SERVER ) );
+				write( 1, FACULTY_PASSWORDS_CHANGED_SERVER,
+				       sizeof(
+				           FACULTY_PASSWORDS_CHANGED_SERVER ) );
 
 				// Changing Password
 				memset( record.password, 0, PASSWORD_LENGTH );
@@ -148,8 +149,8 @@ void faculty_menu_handler( int clientSocket, int faculty_id )
 					               faculty_id );
 					break;
 				case 5:
-					change_password( clientSocket,
-					                 faculty_id );
+					change_password_faculty( clientSocket,
+					                         faculty_id );
 					break;
 				case 6:
 					logout_and_exit_faculty();
