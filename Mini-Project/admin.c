@@ -320,20 +320,24 @@ void add_faculty( int clientSocket )
 			memset( read_buffer, 0, 512 );
 
 			// Memset the fields for course
+			memset( new_faculty.offering_courses, 0,
+			        sizeof( new_faculty.offering_courses ) );
+
+			// Initialize the field for no_of_offering_courses
+			new_faculty.no_of_offering_courses = 0;
 
 			// Password
 			strcpy( new_faculty.password, "faculty" );
 
-			// Student ID
+			// Faculty ID
 			// Apply Semaphores here... OR maintain the details in
 			// another file...
 			no_of_faculty++;
-			new_faculty.faculty_id = no_of_faculty;
 
 			// Username
 			memset( new_faculty.username, 0, USERNAME_LENGTH );
 			snprintf( new_faculty.username, USERNAME_LENGTH,
-			          "FY%02d", new_faculty.faculty_id );
+			          "FY%02d", no_of_faculty );
 
 			write( clientSocket, FACULTY_CREATED_SUCCESSFULLY,
 			       sizeof( FACULTY_CREATED_SUCCESSFULLY ) );
@@ -389,9 +393,6 @@ void modify_student_details( int clientSocket )
 			if( retval == 1 )
 			{
 				memset( read_buffer, 0, 512 );
-
-				// Probably, we might have to apply semaphore
-				// here.
 
 				// Name
 				write( clientSocket, ENTER_STUDENT_NAME,
@@ -763,12 +764,11 @@ void add_student( int clientSocket )
 			// Apply Semaphores here... OR maintain the details in
 			// another file...
 			no_of_students++;
-			new_student.student_id = no_of_students;
 
 			// Username
 			memset( new_student.username, 0, USERNAME_LENGTH );
 			snprintf( new_student.username, USERNAME_LENGTH,
-			          "MT%04d", new_student.student_id );
+			          "MT%04d", no_of_students );
 
 			write( clientSocket, STUDENT_CREATED_SUCCESSFULLY,
 			       sizeof( STUDENT_CREATED_SUCCESSFULLY ) );

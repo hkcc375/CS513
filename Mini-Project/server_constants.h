@@ -33,13 +33,14 @@ extern int no_of_courses;
 	"Modify Faculty Details\n9. Logout and Exit\n\n"
 
 #define FACULTY_MENU                                                           \
-	"\n.......... Welcome to Faculty Menu ..........\n1. View Offering "   \
-	"Courses\n2. Add New Course\n3. Remove Course\n4. Update Course "      \
+	"\n.......... Welcome to Faculty Menu ..........\n1. Add New "         \
+	"Course\n2. Remove Course\n3. View Offering Courses\n4. Update "       \
+	"Course "                                                              \
 	"Details\n5. Change Password\n6. Logout and Exit\n\n"
 
 #define STUDENT_MENU                                                           \
-	"\n.......... Welcome to Student Menu ..........\n1. View All "        \
-	"Courses\n2. Enroll New Course\n3. Drop Course\n4. View Enrolled "     \
+	"\n.......... Welcome to Student Menu ..........\n1. Enroll New "      \
+	"Course\n2. Drop Course\n3. View All Courses\n4. View Enrolled "       \
 	"Course Details\n5. Change Password\n6. Logout and Exit\n\n"
 
 // Authentication
@@ -64,6 +65,15 @@ extern int no_of_courses;
 #define ENTER_FACULTY_EMAIL "Enter Faculty Email : \n"
 #define ENTER_FACULTY_ADDRESS "Enter Faculty Address : \n"
 #define ENTER_FACULTY_ID "Enter Faculty ID : \n"
+
+// Course Details
+#define ENTER_COURSE_ID "Enter Course ID : \n"
+#define ENTER_COURSE_NAME "Enter Course Name : \n"
+#define ENTER_COURSE_DEPARTMENT "Enter Course Department : \n"
+#define ENTER_COURSE_CREDITS "Enter Course Credits : \n"
+#define ENTER_COURSE_TOTAL_SEATS "Enter Course Total No. Of Seats : \n"
+#define ENTER_COURSE_TOTAL_AVAILABLE_SEATS                                     \
+	"Enter Course Total No. Of Available Seats : \n"
 
 // Password Change
 #define ENTER_PASSWORD "\nEnter your new password : \n"
@@ -95,13 +105,22 @@ extern int no_of_courses;
 #define FACULTY_RECORD_INVALID_CLIENT "Faculty id entered was invalid. \n"
 #define FACULTY_RECORD_NOT_FOUND "The given faculty record was not found. \n"
 
-// Faculty Operations
+// Course Record Creation/Modification, Found/Not Found
+#define COURSE_RECORD_NOT_FOUND "The given course record was not found. \n"
+#define COURSE_CREATED_SUCCESSFULLY "\nCourse was created successfully. \n"
+#define COURSE_RECORD_MODIFIED "Course record was successfully modified. \n"
+
+// Course Active/Inactive
+#define COURSE_ACTIVE "The given student is an active student. \n"
+#define COURSE_INACTIVE "The given student is an inactive student. \n"
+#define COURSE_RECORD_BLOCKED "Student was successfully blocked. \n"
+#define COURSE_RECORD_ACTIVATED "Student was successfully activated. \n"
 
 // Constraints on Faculty, Student and Courses
 #define CANNOT_ADD_FACULTY                                                     \
 	"There are 50 faculty. Cannot add any more faculty. \n"
 #define CANNOT_ADD_COURSES                                                     \
-	"There are 125 courses. Cannot add any more courses. \n"
+	"Faculty can add a course, but there are 125 courses already. \n"
 #define CANNOT_ADD_STUDENTS                                                    \
 	"There are 1000 students present. Cannot add any more students. \n"
 #define CANNOT_ENROLL_COURSE                                                   \

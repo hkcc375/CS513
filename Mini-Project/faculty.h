@@ -12,9 +12,9 @@ struct faculty
 	char email[EMAIL_LENGTH];
 	char address[ADDRESS_LENGTH];
 	char username[USERNAME_LENGTH];
-	int faculty_id;
 	char password[PASSWORD_LENGTH];
-	// struct course* course_offered;
+	int no_of_offering_courses;
+	char offering_courses[MAX_COURSES_PER_FACULTY][COURSEID_LENGTH];
 } faculty;
 
 void faculty_connection_handler( int clientSocket );

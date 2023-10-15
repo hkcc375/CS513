@@ -11,7 +11,6 @@ struct student
 	char email[EMAIL_LENGTH];
 	char address[ADDRESS_LENGTH];
 	char username[USERNAME_LENGTH];
-	int student_id;
 	char password[PASSWORD_LENGTH];
 	int status; // 0 -> Inactive, 1 -> Active. By default, student is active
 } student;

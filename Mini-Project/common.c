@@ -99,4 +99,24 @@ void write_faculty_record( int fileDescriptor, struct faculty* record,
 void write_course_record( int fileDescriptor, struct course* record,
                           int record_indx, int record_size, int flag )
 {
+	if( flag == 0 && record_indx == 0 )
+	{
+		lseek( fileDescriptor, 0, SEEK_END );
+	}
+	else
+	{
+		lseek( fileDescriptor, ( record_indx - 1 ) * record_size,
+		       SEEK_SET );
+	}
+	int write_bytes = write( fileDescriptor, record, record_size );
+	if( write_bytes == -1 )
+		perror( COURSE_RECORD_WRITE_FAILED );
+	else if( write_bytes == 0 )
+		write( 1, COURSE_RECORD_NOTHING_WRITTEN,
+		       sizeof( COURSE_RECORD_NOTHING_WRITTEN ) );
+	else
+	{
+		write( 1, COURSE_RECORD_WRITE_SUCCESSFUL,
+		       sizeof( COURSE_RECORD_WRITE_SUCCESSFUL ) );
+	}
 }

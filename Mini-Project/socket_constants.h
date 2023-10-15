@@ -95,4 +95,16 @@
 #define FACULTY_RECORD_READ_SUCCESSFUL                                         \
 	"\nFaculty Record was successfully read from the file. \n"
 
+// Course Record - Read/Write
+#define COURSE_RECORD_WRITE_FAILED "Write Course Record Failed. \n"
+#define COURSE_RECORD_NOTHING_WRITTEN                                          \
+	"No Course Record was written to the file. \n"
+#define COURSE_RECORD_WRITE_SUCCESSFUL                                         \
+	"Course Record was successfully written to the file. \n"
+#define COURSE_FILE_OPEN_FAILED "Opening Course file failed. \n"
+#define COURSE_RECORD_READ_FAILED "Read Course Record Failed. \n"
+#define COURSE_RECORD_EOF "End of Course reached while reading. \n"
+#define COURSE_RECORD_READ_SUCCESSFUL                                          \
+	"\nCourse Record was successfully read from the file. \n"
+
 #endif
