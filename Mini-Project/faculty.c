@@ -15,6 +15,7 @@ int no_of_courses = 0;
 
 void remove_course_from_catalog( int clientSocket, int faculty_id ) {}
 void update_course( int clientSocket, int faculty_id ) {}
+
 void view_offering_courses( int clientSocket, int faculty_id ) {}
 
 void add_new_course( int clientSocket, int faculty_id )

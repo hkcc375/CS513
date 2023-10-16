@@ -62,30 +62,45 @@ void view_all_courses( int clientSocket, int student_id )
 
 				// Course Credits
 				strcat( read_buffer, "Credits : " );
-				snprintf( read_buffer, 512, "%d",
+				char* temp_buffer_credits =
+				    ( char* ) malloc( 10 * sizeof( char ) );
+				snprintf( temp_buffer_credits, 10, "%d",
 				          record.credits );
+				strcat( read_buffer, temp_buffer_credits );
 				strcat( read_buffer, "\n" );
 				write( clientSocket, read_buffer,
 				       strlen( read_buffer ) );
+				free( temp_buffer_credits );
 				memset( read_buffer, 0, 512 );
 
 				// Course Total No. Of Seats
 				strcat( read_buffer, "Total No. Of Seats : " );
-				snprintf( read_buffer, 512, "%d",
+				char* temp_buffer_total_seats =
+				    ( char* ) malloc( 10 * sizeof( char ) );
+				snprintf( temp_buffer_total_seats, 10, "%d",
 				          record.total_number_of_seats );
+				strcat( read_buffer, temp_buffer_total_seats );
 				strcat( read_buffer, "\n" );
 				write( clientSocket, read_buffer,
 				       strlen( read_buffer ) );
+				free( temp_buffer_total_seats );
 				memset( read_buffer, 0, 512 );
 
 				// Course Total No. Of Available Seats
 				strcat( read_buffer,
 				        "Total No. Of Available Seats : " );
-				snprintf( read_buffer, 512, "%d",
+				char* temp_buffer_total_seats_available =
+				    ( char* ) malloc( 10 * sizeof( char ) );
+				snprintf( temp_buffer_total_seats_available, 10,
+				          "%d",
 				          record.number_of_available_seats );
+				strcat( read_buffer,
+				        temp_buffer_total_seats_available );
+				strcat( read_buffer, "\n" );
 				strcat( read_buffer, "\n" );
 				write( clientSocket, read_buffer,
 				       strlen( read_buffer ) );
+				free( temp_buffer_total_seats_available );
 				memset( read_buffer, 0, 512 );
 			}
 		}
