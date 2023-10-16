@@ -6,14 +6,93 @@
 #include <unistd.h>
 
 #include "common.h"
+#include "course.h"
 #include "server_constants.h"
 #include "socket_constants.h"
 #include "student.h"
 
 void enroll_course( int clientSocket, int student_id ) {}
 void drop_course( int clientSocket, int student_id ) {}
-void view_all_courses( int clientSocket, int student_id ) {}
 void view_enrolled_courses( int clientSocket, int student_id ) {}
+
+void view_all_courses( int clientSocket, int student_id )
+{
+	struct course record;
+	char* read_buffer = ( char* ) malloc( 512 * sizeof( char ) );
+	memset( read_buffer, 0, 512 );
+	int fileDescriptor = open( "course.txt", O_CREAT | O_RDONLY, 0777 );
+	if( fileDescriptor == -1 )
+		perror( COURSE_FILE_OPEN_FAILED );
+	else
+	{
+		int bytesToRead;
+		while( ( bytesToRead = read( fileDescriptor, &record,
+		                             sizeof( struct course ) ) ) > 0 )
+		{
+			// We have reached the EOF
+			if( bytesToRead != sizeof( struct course ) )
+			{
+				perror( COURSE_RECORD_EOF );
+			}
+			else
+			{
+				// Course Name
+				strcat( read_buffer, "Course Name : " );
+				strcat( read_buffer, record.course_name );
+				strcat( read_buffer, "\n" );
+				write( clientSocket, read_buffer,
+				       strlen( read_buffer ) );
+				memset( read_buffer, 0, 512 );
+
+				// Course ID
+				strcat( read_buffer, "Course ID : " );
+				strcat( read_buffer, record.course_id );
+				strcat( read_buffer, "\n" );
+				write( clientSocket, read_buffer,
+				       strlen( read_buffer ) );
+				memset( read_buffer, 0, 512 );
+
+				// Course Department
+				strcat( read_buffer, "Department : " );
+				strcat( read_buffer, record.department );
+				strcat( read_buffer, "\n" );
+				write( clientSocket, read_buffer,
+				       strlen( read_buffer ) );
+				memset( read_buffer, 0, 512 );
+
+				// Course Credits
+				strcat( read_buffer, "Credits : " );
+				snprintf( read_buffer, 512, "%d",
+				          record.credits );
+				strcat( read_buffer, "\n" );
+				write( clientSocket, read_buffer,
+				       strlen( read_buffer ) );
+				memset( read_buffer, 0, 512 );
+
+				// Course Total No. Of Seats
+				strcat( read_buffer, "Total No. Of Seats : " );
+				snprintf( read_buffer, 512, "%d",
+				          record.total_number_of_seats );
+				strcat( read_buffer, "\n" );
+				write( clientSocket, read_buffer,
+				       strlen( read_buffer ) );
+				memset( read_buffer, 0, 512 );
+
+				// Course Total No. Of Available Seats
+				strcat( read_buffer,
+				        "Total No. Of Available Seats : " );
+				snprintf( read_buffer, 512, "%d",
+				          record.number_of_available_seats );
+				strcat( read_buffer, "\n" );
+				write( clientSocket, read_buffer,
+				       strlen( read_buffer ) );
+				memset( read_buffer, 0, 512 );
+			}
+		}
+	}
+	free( read_buffer );
+	close( fileDescriptor );
+}
 
 void change_password_student( int clientSocket, int student_id )
 {
