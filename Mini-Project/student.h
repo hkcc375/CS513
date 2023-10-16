@@ -13,6 +13,8 @@ struct student
 	char username[USERNAME_LENGTH];
 	char password[PASSWORD_LENGTH];
 	int status; // 0 -> Inactive, 1 -> Active. By default, student is active
+	int number_of_courses_taken;
+	char enrolled_courses[MAX_COURSES_PER_STUDENT][COURSEID_LENGTH];
 } student;
 
 void student_connection_handler( int clientSocket );

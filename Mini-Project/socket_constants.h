@@ -107,4 +107,16 @@
 #define COURSE_RECORD_READ_SUCCESSFUL                                          \
 	"\nCourse Record was successfully read from the file. \n"
 
+// Course -> Student Mapping Record - Read/Write
+#define MAPPING_RECORD_WRITE_FAILED "Write Mapping Record Failed. \n"
+#define MAPPING_RECORD_NOTHING_WRITTEN                                         \
+	"NO Mapping Record was written to the file. \n"
+#define MAPPING_RECORD_WRITE_SUCCESSFUL                                        \
+	"Mapping Record was successfully written to the file. \n"
+#define MAPPING_FILE_OPEN_FAILED "Opening Mapping file failed. \n"
+#define MAPPING_RECORD_READ_FAILED "Read Mapping Record Failed. \n"
+#define MAPPING_RECORD_EOF "End of Mapping file reached while reading. \n"
+#define MAPPING_RECORD_READ_SUCCESSFUL                                         \
+	"\nMapping Record was successfully read from the file. \n"
+
 #endif

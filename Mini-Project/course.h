@@ -2,7 +2,7 @@
 #define COURSE_H
 
 #include "server_constants.h"
-#include "stdbool.h"
+
 struct course
 {
 	char course_id[COURSEID_LENGTH];

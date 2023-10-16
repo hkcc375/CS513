@@ -21,35 +21,36 @@ extern int no_of_faculty;
 extern int no_of_courses;
 
 // Role Based Prompts
-#define INITIAL_PROMPT                                                         \
-	".................... Welcome Back to Academia Portal :: Course "      \
-	"Registration ....................\nLogin Type : Enter your choice { " \
+#define INITIAL_PROMPT                                                                                                 \
+	".................... Welcome Back to Academia Portal :: Course "                                              \
+	"Registration ....................\nLogin Type : Enter your choice { "                                         \
 	"1. Admin 2.Faculty 3.Student }"
 
-#define ADMIN_MENU                                                             \
-	"\n.......... Welcome to Admin Menu ..........\n1. Add Student\n2. "   \
-	"View Student Details\n3. Add Faculty\n4. View Faculty Details\n5. "   \
-	"Activate Student\n6. Block Student\n7. Modify Student Details\n8. "   \
+#define ADMIN_MENU                                                                                                     \
+	"\n.......... Welcome to Admin Menu ..........\n1. Add Student\n2. "                                           \
+	"View Student Details\n3. Add Faculty\n4. View Faculty Details\n5. "                                           \
+	"Activate Student\n6. Block Student\n7. Modify Student Details\n8. "                                           \
 	"Modify Faculty Details\n9. Logout and Exit\n\n"
 
-#define FACULTY_MENU                                                           \
-	"\n.......... Welcome to Faculty Menu ..........\n1. Add New "         \
-	"Course\n2. Remove Course\n3. View Offering Courses\n4. Update "       \
-	"Course "                                                              \
+#define FACULTY_MENU                                                                                                   \
+	"\n.......... Welcome to Faculty Menu ..........\n1. Add New "                                                 \
+	"Course\n2. Remove Course\n3. View Offering Courses\n4. Update "                                               \
+	"Course "                                                                                                      \
 	"Details\n5. Change Password\n6. Logout and Exit\n\n"
 
-#define STUDENT_MENU                                                           \
-	"\n.......... Welcome to Student Menu ..........\n1. Enroll New "      \
-	"Course\n2. Drop Course\n3. View All Courses\n4. View Enrolled "       \
+#define STUDENT_MENU                                                                                                   \
+	"\n.......... Welcome to Student Menu ..........\n1. Enroll New "                                              \
+	"Course\n2. Drop Course\n3. View All Courses\n4. View Enrolled "                                               \
 	"Course Details\n5. Change Password\n6. Logout and Exit\n\n"
 
 // Authentication
 #define LOGIN_MESSAGE "\nEnter your login id : \n"
 #define PASSWORD_MESSAGE "Enter your password : \n"
-#define AUTHENTICATION_FAILED                                                  \
-	"Either your username or password is incorrect. \n"
+#define AUTHENTICATION_FAILED "Either your username or password is incorrect. \n"
 #define AUTHENTICATION_SUCCESS "Login was successful. \n"
 #define AUTHENTICATION_USERNAME_EMPTY "Please enter a valid username. \n"
+
+#define ENROLL_COURSEID_EMPTY "Please enter a valid course id. \n"
 
 // Student Details
 #define ENTER_STUDENT_NAME "Enter Student Name : \n"
@@ -72,8 +73,7 @@ extern int no_of_courses;
 #define ENTER_COURSE_DEPARTMENT "Enter Course Department : \n"
 #define ENTER_COURSE_CREDITS "Enter Course Credits : \n"
 #define ENTER_COURSE_TOTAL_SEATS "Enter Course Total No. Of Seats : \n"
-#define ENTER_COURSE_TOTAL_AVAILABLE_SEATS                                     \
-	"Enter Course Total No. Of Available Seats : \n"
+#define ENTER_COURSE_TOTAL_AVAILABLE_SEATS "Enter Course Total No. Of Available Seats : \n"
 
 // Password Change
 #define ENTER_PASSWORD "\nEnter your new password : \n"
@@ -94,6 +94,7 @@ extern int no_of_courses;
 
 // Student Active/Inactive
 #define STUDENT_ACTIVE "The given student is an active student. \n"
+#define STUDENT_INACTIVE_LOGIN "You are inactive student. \n"
 #define STUDENT_INACTIVE "The given student is an inactive student. \n"
 #define STUDENT_RECORD_BLOCKED "Student was successfully blocked. \n"
 #define STUDENT_RECORD_ACTIVATED "Student was successfully activated. \n"
@@ -117,16 +118,24 @@ extern int no_of_courses;
 #define COURSE_RECORD_ACTIVATED "Student was successfully activated. \n"
 
 // Constraints on Faculty, Student and Courses
-#define CANNOT_ADD_FACULTY                                                     \
-	"There are 50 faculty. Cannot add any more faculty. \n"
-#define CANNOT_ADD_COURSES                                                     \
-	"Faculty can add a course, but there are 125 courses already. \n"
-#define CANNOT_ADD_STUDENTS                                                    \
-	"There are 1000 students present. Cannot add any more students. \n"
-#define CANNOT_ENROLL_COURSE                                                   \
-	"A Student can enroll for at most 6 courses. Cannot perform Enroll "   \
+#define CANNOT_ADD_FACULTY "There are 50 faculty. Cannot add any more faculty. \n"
+#define CANNOT_ADD_COURSES "Faculty can add a course, but there are 125 courses already. \n"
+#define CANNOT_ADD_STUDENTS "There are 1000 students present. Cannot add any more students. \n"
+#define CANNOT_ENROLL_COURSE                                                                                           \
+	"A Student can enroll for at most 6 courses. Cannot perform Enroll "                                           \
 	"Course. \n"
-#define CANNOT_ADD_COURSE_FACULTY                                              \
-	"A faculty can offer only 5 courses. Cannot perform Add Course. \n"
+#define CANNOT_ENROLL_COURSE_MAX_LIMIT_REACHED_STUDENT                                                                 \
+	"This course has all the seats filled. You cannot enroll to this "                                             \
+	"course. \n"
+#define CANNOT_ADD_COURSE_FACULTY "A faculty can offer only 5 courses. Cannot perform Add Course. \n"
+#define COURSE_ALREADY_ENROLLED_CLIENT                                                                                 \
+	"You have already enrolled for this course. Cannot perform Enroll "                                            \
+	"Course. \n"
+#define COURSE_ALREADY_ENROLLED_SERVER                                                                                 \
+	"Student has already enrolled for this course. Cannot perform Enroll "                                         \
+	"Course. \n"
+
+#define ENROLL_COURSE_SUCCESSFUL_CLIENT "You have successfully enrolled to this course. \n"
+#define ENROLL_COURSE_SUCCESSFUL_SERVER "Student has successfully enrolled to this course. \n"
 
 #endif
