@@ -12,150 +12,138 @@
 #include "socket_constants.h"
 #include "student.h"
 
-// void drop_course( int clientSocket, int student_id )
-// {
-// 	// Student will give his input for the course that he wants to drop.
-// 	// Now I have to drop the record from the student record as well as the course->student mapping from mapping
-// 	// file. --- DROPS THE RECORD FROM THE STUDENT - WORKS !!!, DROPS THE RECORD FROM MAPPING FILE -- ???
-// 	// Also I have to increase the number of available seats -- WORKS !!!
-// 	// Add checks to see if the student has already enrolled to the course... -- WORKS !!!
+void drop_course( int clientSocket, int student_id )
+{
+	struct student student_record;
+	struct course course_record;
+	struct mapping mapping_record;
+	int course_id;
+	char* read_buffer = ( char* ) malloc( 512 * sizeof( char ) );
+	memset( read_buffer, 0, 512 );
 
-// 	struct student student_record;
-// 	struct course course_record;
-// 	struct mapping mapping_record;
-// 	int course_id;
-// 	char* read_buffer = ( char* ) malloc( 512 * sizeof( char ) );
-// 	memset( read_buffer, 0, 512 );
+	int fileDescriptor_mapping = open( "mapping.txt", O_CREAT | O_RDWR, 0777 );
+	if( fileDescriptor_mapping == -1 ) perror( MAPPING_FILE_OPEN_FAILED );
 
-// 	int fileDescriptor_mapping = open( "mapping.txt", O_CREAT | O_RDWR, 0777 );
-// 	if( fileDescriptor_mapping == -1 ) perror( MAPPING_FILE_OPEN_FAILED );
+	int fileDescriptor_student = open( "student.txt", O_CREAT | O_RDWR, 0777 );
+	if( fileDescriptor_student == -1 ) perror( STUDENT_FILE_OPEN_FAILED );
 
-// 	int fileDescriptor_student = open( "student.txt", O_CREAT | O_RDWR, 0777 );
-// 	if( fileDescriptor_student == -1 ) perror( STUDENT_FILE_OPEN_FAILED );
+	int fileDescriptor_course = open( "course.txt", O_CREAT | O_RDWR, 0777 );
+	if( fileDescriptor_student == -1 ) perror( COURSE_FILE_OPEN_FAILED );
 
-// 	int fileDescriptor_course = open( "course.txt", O_CREAT | O_RDWR, 0777 );
-// 	if( fileDescriptor_student == -1 ) perror( COURSE_FILE_OPEN_FAILED );
+	write( clientSocket, ENTER_COURSE_ID, sizeof( ENTER_COURSE_ID ) );
+	sleep( 1 );
+	int read_course_id_bytes = read( clientSocket, read_buffer, 512 );
+	if( read_course_id_bytes == -1 ) perror( "Could not read course id." );
+	read_buffer[read_course_id_bytes - 1] = '\0';
 
-// 	write( clientSocket, ENTER_COURSE_ID, sizeof( ENTER_COURSE_ID ) );
-// 	sleep( 1 );
-// 	int read_course_id_bytes = read( clientSocket, read_buffer, 512 );
-// 	if( read_course_id_bytes == -1 ) perror( "Could not read course id." );
-// 	read_buffer[read_course_id_bytes - 1] = '\0';
+	char* temp_course_id_buffer = ( char* ) malloc( COURSEID_LENGTH * sizeof( char ) );
+	memset( temp_course_id_buffer, 0, COURSEID_LENGTH );
+	strcpy( temp_course_id_buffer, read_buffer + strlen( read_buffer ) - 3 );
+	course_id = atoi( temp_course_id_buffer );
 
-// 	char* temp_course_id_buffer = ( char* ) malloc( COURSEID_LENGTH * sizeof( char ) );
-// 	memset( temp_course_id_buffer, 0, COURSEID_LENGTH );
-// 	strcpy( temp_course_id_buffer, read_buffer + strlen( read_buffer ) - 3 );
-// 	course_id = atoi( temp_course_id_buffer );
+	if( course_id == 0 ) { write( clientSocket, ENROLL_COURSEID_EMPTY, sizeof( ENROLL_COURSEID_EMPTY ) ); }
+	else
+	{
+		int retval_student = read_student_record( fileDescriptor_student, &student_record, student_id,
+		                                          sizeof( struct student ) );
 
-// 	if( course_id == 0 ) { write( clientSocket, ENROLL_COURSEID_EMPTY, sizeof( ENROLL_COURSEID_EMPTY ) ); }
-// 	else
-// 	{
-// 		int retval_student = read_student_record( fileDescriptor_student, &student_record, student_id,
-// 		                                          sizeof( struct student ) );
+		int retval_course = read_course_record( fileDescriptor_course, &course_record, course_id,
+		                                        sizeof( struct course ) );
 
-// 		int retval_course = read_course_record( fileDescriptor_course, &course_record, course_id,
-// 		                                        sizeof( struct course ) );
+		if( retval_course == 1 )
+		{
+			int flag                     = 1; // Assume that the student has not enrolled for any course.
+			int check_if_course_enrolled = 0; // Assume that the student has not enrolled for this course.
+			for( int i = 0; i < MAX_COURSES_PER_STUDENT; i++ )
+			{
+				if( isRowEmpty( student_record.enrolled_courses, i ) )
+					continue;
+				else
+				{
+					// This means that the student has enrolled for at least 1 course.
+					flag = 0;
+					if( !strcmp( student_record.enrolled_courses[i], read_buffer ) )
+					{
+						// Means that the student has enrolled for the given course;
+						check_if_course_enrolled = 1;
 
-// 		if( retval_course == 1 )
-// 		{
-// 			int flag                     = 1; // Assume that the student has not enrolled for any course.
-// 			int check_if_course_enrolled = 0; // Assume that the student has not enrolled for this course.
-// 			for( int i = 0; i < MAX_COURSES_PER_STUDENT; i++ )
-// 			{
-// 				if( isRowEmpty( student_record.enrolled_courses, i ) )
-// 					continue;
-// 				else
-// 				{
-// 					// This means that the student has enrolled for at least 1 course.
-// 					flag = 0;
-// 					if( !strcmp( student_record.enrolled_courses[i], read_buffer ) )
-// 					{
-// 						// Means that the student has enrolled for the given course;
-// 						check_if_course_enrolled = 1;
+						// Memset the field for this course.
+						// Probably I might have to use a semaphore here...
+						memset( &student_record.enrolled_courses[i], 0, COURSEID_LENGTH );
+						// I have to decrease the number of courses taken by the student
+						student_record.number_of_courses_taken -= 1;
+						write_student_record( fileDescriptor_student, &student_record,
+						                      student_id, sizeof( struct student ), 1 );
+						break;
+					}
+				}
+			}
+			if( flag == 1 && check_if_course_enrolled == 0 )
+			{
+				write( clientSocket, NOT_ENROLLED_ANY_COURSE_CLIENT,
+				       sizeof( NOT_ENROLLED_ANY_COURSE_CLIENT ) );
+				write( 1, NOT_ENROLLED_ANY_COURSE_SERVER, sizeof( NOT_ENROLLED_ANY_COURSE_SERVER ) );
+				sleep( 1 );
+				write( clientSocket, NOT_ENROLLED_THIS_COURSE_CLIENT,
+				       sizeof( NOT_ENROLLED_THIS_COURSE_CLIENT ) );
+				write( 1, NOT_ENROLLED_THIS_COURSE_SERVER, sizeof( NOT_ENROLLED_THIS_COURSE_SERVER ) );
+			}
+			else if( flag == 0 && check_if_course_enrolled == 0 )
+			{
+				write( clientSocket, ENROLLED_ANY_COURSE_CLIENT, sizeof( ENROLLED_ANY_COURSE_CLIENT ) );
+				write( 1, ENROLLED_ANY_COURSE_SERVER, sizeof( ENROLLED_ANY_COURSE_SERVER ) );
+				sleep( 1 );
+				write( clientSocket, NOT_ENROLLED_THIS_COURSE_CLIENT,
+				       sizeof( NOT_ENROLLED_THIS_COURSE_CLIENT ) );
+				write( 1, NOT_ENROLLED_THIS_COURSE_SERVER, sizeof( NOT_ENROLLED_THIS_COURSE_SERVER ) );
+			}
+			else
+			{
+				// Remove the mapping
+				int bytesToRead;
+				int mapping_no = 0;
+				while( ( bytesToRead = read( fileDescriptor_mapping, &mapping_record,
+				                             sizeof( struct mapping ) ) ) > 0 )
+				{
+					// We have reached the EOF
+					if( bytesToRead != sizeof( struct course ) ) { perror( MAPPING_RECORD_EOF ); }
 
-// 						// Memset the field for this course.
-// 						// Probably I might have to use a semaphore here...
-// 						memset( &student_record.enrolled_courses[i], 0, COURSEID_LENGTH );
-// 						// I have to decrease the number of courses taken by the student
-// 						student_record.number_of_courses_taken -= 1;
+					if( mapping_record.course_id == course_id &&
+					    mapping_record.student_id == student_id )
+					{
+						// Memset the entire structure.
+						write( clientSocket, SUCCESSFULLY_COURSE_DROPPED_CLIENT,
+						       sizeof( SUCCESSFULLY_COURSE_DROPPED_CLIENT ) );
+						write( 1, SUCCESSFULLY_COURSE_DROPPED_SERVER,
+						       sizeof( SUCCESSFULLY_COURSE_DROPPED_SERVER ) );
 
-// 						// Now increase the number of available seats by 1.
-// 						// Definetely have to use semaphore here..
-// 						course_record.number_of_available_seats += 1;
+						memset( &mapping_record, 0, sizeof( struct mapping ) );
+						break;
+					}
+					mapping_no++;
+				}
+				write_mapping_record( fileDescriptor_mapping, &mapping_record, mapping_no + 1,
+				                      sizeof( struct mapping ), 1 );
 
-// 						// Remove the mapping
-// 						int bytesToRead;
-// 						int mapping_no = 0;
-// 						while( ( bytesToRead = read( fileDescriptor_mapping, &mapping_record,
-// 						                             sizeof( struct course ) ) ) > 0 )
-// 						{
-// 							// We have reached the EOF
-// 							if( bytesToRead != sizeof( struct course ) )
-// 							{
-// 								perror( MAPPING_RECORD_EOF );
-// 							}
-
-// 							if( mapping_record.course_id == course_id &&
-// 							    mapping_record.student_id == student_id )
-// 							{
-// 								// Memset the entire structure.
-// 								write( clientSocket, SUCCESSFULLY_COURSE_DROPPED_CLIENT,
-// 								       sizeof( SUCCESSFULLY_COURSE_DROPPED_CLIENT ) );
-// 								write( 1, SUCCESSFULLY_COURSE_DROPPED_SERVER,
-// 								       sizeof( SUCCESSFULLY_COURSE_DROPPED_SERVER ) );
-
-// 								memset( &mapping_record, 0, sizeof( struct mapping ) );
-// 								break;
-// 							}
-// 							mapping_no++;
-// 						}
-
-// 						// Now we have to make changes, i.e, we have to write them to the
-// 						// appropriate files
-// 						write_mapping_record( fileDescriptor_mapping, &mapping_record,
-// 						                      mapping_no + 1, sizeof( struct mapping ), 1 );
-// 						sleep( 2 );
-// 						write_student_record( fileDescriptor_student, &student_record,
-// 						                      student_id, sizeof( struct student ), 1 );
-// 						sleep( 2 );
-// 						write_course_record( fileDescriptor_course, &course_record, course_id,
-// 						                     sizeof( struct course ), 1 );
-// 						break;
-// 					}
-// 				}
-// 			}
-// 			if( flag == 1 && check_if_course_enrolled == 0 )
-// 			{
-// 				write( clientSocket, NOT_ENROLLED_ANY_COURSE_CLIENT,
-// 				       sizeof( NOT_ENROLLED_ANY_COURSE_CLIENT ) );
-// 				write( 1, NOT_ENROLLED_ANY_COURSE_SERVER, sizeof( NOT_ENROLLED_ANY_COURSE_SERVER ) );
-// 				sleep( 1 );
-// 				write( clientSocket, NOT_ENROLLED_THIS_COURSE_CLIENT,
-// 				       sizeof( NOT_ENROLLED_THIS_COURSE_CLIENT ) );
-// 				write( 1, NOT_ENROLLED_THIS_COURSE_SERVER, sizeof( NOT_ENROLLED_THIS_COURSE_SERVER ) );
-// 			}
-// 			else if( flag == 0 && check_if_course_enrolled == 0 )
-// 			{
-// 				write( clientSocket, ENROLLED_ANY_COURSE_CLIENT, sizeof( ENROLLED_ANY_COURSE_CLIENT ) );
-// 				write( 1, ENROLLED_ANY_COURSE_SERVER, sizeof( ENROLLED_ANY_COURSE_SERVER ) );
-// 				sleep( 1 );
-// 				write( clientSocket, NOT_ENROLLED_THIS_COURSE_CLIENT,
-// 				       sizeof( NOT_ENROLLED_THIS_COURSE_CLIENT ) );
-// 				write( 1, NOT_ENROLLED_THIS_COURSE_SERVER, sizeof( NOT_ENROLLED_THIS_COURSE_SERVER ) );
-// 			}
-// 		}
-// 		else
-// 		{
-// 			// The course was not found...
-// 			write( clientSocket, COURSE_RECORD_NOT_FOUND, sizeof( COURSE_RECORD_NOT_FOUND ) );
-// 		}
-// 	}
-// 	free( read_buffer );
-// 	free( temp_course_id_buffer );
-// 	close( fileDescriptor_student );
-// 	close( fileDescriptor_course );
-// 	close( fileDescriptor_mapping );
-// }
+				// Now increase the number of available seats by 1.
+				// Definetely have to use semaphore here..
+				course_record.number_of_available_seats += 1;
+				write_course_record( fileDescriptor_course, &course_record, course_id,
+				                     sizeof( struct course ), 1 );
+			}
+		}
+		else
+		{
+			// The course was not found...
+			write( clientSocket, COURSE_RECORD_NOT_FOUND, sizeof( COURSE_RECORD_NOT_FOUND ) );
+		}
+	}
+	free( read_buffer );
+	free( temp_course_id_buffer );
+	close( fileDescriptor_student );
+	close( fileDescriptor_course );
+	close( fileDescriptor_mapping );
+}
 
 void view_enrolled_courses( int clientSocket, int student_id )
 {
@@ -366,91 +354,10 @@ void enroll_course( int clientSocket, int student_id )
 						                     sizeof( course ), 1 );
 						write( 1, COURSE_RECORD_MODIFIED, sizeof( COURSE_RECORD_MODIFIED ) );
 
-						// Maybe I may have to use semaphore..
-						int bytesToRead;
-						// int mapping_no = 0;
-						// struct mapping old_record;
-						// while( ( bytesToRead = read( fileDescriptor_mapping, &old_record,
-						//                              sizeof( struct course ) ) ) > 0 )
-						// {
-						// 	if( isStructEmpty( &old_record ) )
-						// 	{
-						// 		mapping_record.mapping_id = mapping_no;
-						// 		mapping_record.course_id  = course_id;
-						// 		mapping_record.student_id = student_id;
-						// 		write_mapping_record( fileDescriptor_mapping,
-						// 		                      &mapping_record, mapping_no,
-						// 		                      sizeof( struct mapping ), 1 );
-						// 	}
-
-						// 	// We have reached the EOF
-						// 	else if( bytesToRead != sizeof( struct course ) )
-						// 	{
-						// 		perror( MAPPING_RECORD_EOF );
-						// 		no_of_mappings++;
-						// 		mapping_record.mapping_id = no_of_mappings;
-						// 		mapping_record.course_id  = course_id;
-						// 		mapping_record.student_id = student_id;
-						// 		write_mapping_record( fileDescriptor_mapping,
-						// 		                      &mapping_record, 0,
-						// 		                      sizeof( struct mapping ), 0 );
-						// 	}
-						// 	mapping_no++;
-						// }
-
-						// int mapping_no = -1; // Initialize mapping number to an invalid value
-						// struct mapping old_record;
-
-						// // Loop to search for a free space
-						// while( read( fileDescriptor_mapping, &old_record,
-						//              sizeof( struct mapping ) ) > 0 )
-						// {
-						// 	if( isStructEmpty( &old_record ) )
-						// 	{
-						// 		// Found a free space, save the mapping number and break
-						// 		mapping_no = old_record.mapping_id;
-						// 		break;
-						// 	}
-						// 	mapping_no = old_record.mapping_id;
-						// }
-
-						// // If a free space was found, update that location
-						// if( mapping_no != -1 )
-						// {
-						// 	mapping_record.mapping_id = mapping_no;
-						// 	write_mapping_record( fileDescriptor_mapping, &mapping_record,
-						// 	                      mapping_no, sizeof( struct mapping ), 1 );
-						// }
-						// else
-						// {
-						// 	// If no free space was found, write the record at the end of
-						// 	// the file
-						// 	write_mapping_record( fileDescriptor_mapping, &mapping_record,
-						// 	                      0, sizeof( struct mapping ), 0 );
-						// }
 						mapping_record.course_id  = course_id;
 						mapping_record.student_id = student_id;
 						write_mapping_record( fileDescriptor_mapping, &mapping_record, 0,
 						                      sizeof( struct mapping ), 0 );
-
-						// Modifying student enrolled course details ..
-						// strcpy( &student_record.enrolled_courses
-						//                    [student_record.number_of_courses_taken -
-						//                    1] [COURSEID_LENGTH],
-						//         course_record.course_id );
-						student_record.number_of_courses_taken++;
-						strcpy( &student_record.enrolled_courses[index - 1][COURSEID_LENGTH],
-						        course_record.course_id );
-
-						write_student_record( fileDescriptor_student, &student_record,
-						                      student_id, sizeof( struct student ), 1 );
-						write( 1, STUDENT_RECORD_MODIFIED, sizeof( STUDENT_RECORD_MODIFIED ) );
-						sleep( 1 );
-						write( clientSocket, ENROLL_COURSE_SUCCESSFUL_CLIENT,
-						       sizeof( ENROLL_COURSE_SUCCESSFUL_CLIENT ) );
-
-						write( 1, ENROLL_COURSE_SUCCESSFUL_SERVER,
-						       sizeof( ENROLL_COURSE_SUCCESSFUL_SERVER ) );
 					}
 				}
 				else
@@ -460,6 +367,23 @@ void enroll_course( int clientSocket, int student_id )
 					write( clientSocket, COURSE_RECORD_NOT_FOUND,
 					       sizeof( COURSE_RECORD_NOT_FOUND ) );
 				}
+				// Modifying student enrolled course details ..
+				// strcpy( &student_record.enrolled_courses
+				//                    [student_record.number_of_courses_taken -
+				//                    1] [COURSEID_LENGTH],
+				//         course_record.course_id );
+				student_record.number_of_courses_taken++;
+				strcpy( &student_record.enrolled_courses[index - 1][COURSEID_LENGTH],
+				        course_record.course_id );
+
+				write_student_record( fileDescriptor_student, &student_record, student_id,
+				                      sizeof( struct student ), 1 );
+				write( 1, STUDENT_RECORD_MODIFIED, sizeof( STUDENT_RECORD_MODIFIED ) );
+				sleep( 1 );
+				write( clientSocket, ENROLL_COURSE_SUCCESSFUL_CLIENT,
+				       sizeof( ENROLL_COURSE_SUCCESSFUL_CLIENT ) );
+
+				write( 1, ENROLL_COURSE_SUCCESSFUL_SERVER, sizeof( ENROLL_COURSE_SUCCESSFUL_SERVER ) );
 			}
 		}
 		else
