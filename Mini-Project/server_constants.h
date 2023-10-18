@@ -19,6 +19,7 @@
 extern int no_of_students;
 extern int no_of_faculty;
 extern int no_of_courses;
+extern int no_of_mappings;
 
 // Role Based Prompts
 #define INITIAL_PROMPT                                                                                                 \
@@ -137,5 +138,15 @@ extern int no_of_courses;
 
 #define ENROLL_COURSE_SUCCESSFUL_CLIENT "You have successfully enrolled to this course. \n"
 #define ENROLL_COURSE_SUCCESSFUL_SERVER "Student has successfully enrolled to this course. \n"
+
+#define ENROLLED_ANY_COURSE_SERVER "Student has enrolled for at least 1 course. \n"
+#define ENROLLED_ANY_COURSE_CLIENT "You have enrolled for at least 1 course. \n"
+#define NOT_ENROLLED_ANY_COURSE_CLIENT "You have not enrolled for any courses. \n"
+#define NOT_ENROLLED_THIS_COURSE_CLIENT "You have not enrolled for this course. Cannot perform Drop Course. \n"
+#define NOT_ENROLLED_ANY_COURSE_SERVER "The student has not enrolled for any courses. \n"
+#define NOT_ENROLLED_THIS_COURSE_SERVER "The student has not enrolled for this course. Cannot perform Drop Course. \n"
+
+#define SUCCESSFULLY_COURSE_DROPPED_CLIENT "You have successfully dropped the course. \n"
+#define SUCCESSFULLY_COURSE_DROPPED_SERVER "The student has successfully dropped the course. \n"
 
 #endif

@@ -1,9 +1,12 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "common.h"
+#include "course_student_mapping.h"
+#include "server_constants.h"
 #include "socket_constants.h"
 
 int read_student_record( int fileDescriptor, struct student* record, int record_indx, int record_size )
@@ -112,4 +115,19 @@ void write_mapping_record( int fileDescriptor, struct mapping* record, int recor
 	else if( write_bytes == 0 )
 		write( 1, MAPPING_RECORD_NOTHING_WRITTEN, sizeof( MAPPING_RECORD_NOTHING_WRITTEN ) );
 	else { write( 1, MAPPING_RECORD_WRITE_SUCCESSFUL, sizeof( MAPPING_RECORD_WRITE_SUCCESSFUL ) ); }
+}
+
+int isRowEmpty( const char array[][COURSEID_LENGTH], int row )
+{
+	char emptyRow[COURSEID_LENGTH];
+	memset( emptyRow, '\0', COURSEID_LENGTH );                   // Create a row of null characters
+	return memcmp( array[row], emptyRow, COURSEID_LENGTH ) == 0; // Compare the row with an empty row
+}
+
+int isStructEmpty( const struct mapping* s )
+{
+	struct mapping mapping_record;
+	memset( &mapping_record, 0, sizeof( struct mapping ) );
+
+	return memcmp( s, &mapping_record, sizeof( struct mapping ) ) == 0;
 }

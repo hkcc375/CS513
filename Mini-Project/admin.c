@@ -264,6 +264,7 @@ void add_faculty( int clientSocket )
 			new_faculty.no_of_offering_courses = 0;
 
 			// Password
+			memset( new_faculty.password, 0, PASSWORD_LENGTH );
 			strcpy( new_faculty.password, "faculty" );
 
 			// Faculty ID
