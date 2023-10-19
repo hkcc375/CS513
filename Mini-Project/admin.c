@@ -12,8 +12,8 @@
 #include "student.h"
 
 // Maybe I will have to maintain this in another file.
-int no_of_students = 0;
-int no_of_faculty  = 0;
+// int no_of_students = 0;
+// int no_of_faculty  = 0;
 
 void modify_faculty_details( int clientSocket )
 {
@@ -691,6 +691,7 @@ void admin_menu_handler( int clientSocket )
 
 void admin_connection_handler( int clientSocket )
 {
+	loadVariablesFromFile();
 	char *username_buffer, *password_buffer;
 	username_buffer = ( char* ) malloc( 16 * sizeof( char ) );
 	password_buffer = ( char* ) malloc( 16 * sizeof( char ) );

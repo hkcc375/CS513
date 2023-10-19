@@ -11,13 +11,282 @@
 #include "socket_constants.h"
 
 // Maybe I will have to store this in another file.
-int no_of_courses  = 0;
-int no_of_mappings = 0;
+// int no_of_courses  = 0;
+// int no_of_mappings = 0;
 
-void remove_course_from_catalog( int clientSocket, int faculty_id ) {}
 void update_course( int clientSocket, int faculty_id ) {}
 
-void view_offering_courses( int clientSocket, int faculty_id ) {}
+void remove_course_from_catalog( int clientSocket, int faculty_id )
+{
+	struct faculty faculty_record;
+	struct course course_record;
+	struct mapping mapping_record;
+	struct student student_record;
+	int course_id;
+	int fileDescriptor_faculty = open( "faculty.txt", O_CREAT | O_RDWR, 0777 );
+	if( fileDescriptor_faculty == -1 ) perror( FACULTY_FILE_OPEN_FAILED );
+
+	int fileDescriptor_student = open( "student.txt", O_CREAT | O_RDWR, 0777 );
+	if( fileDescriptor_student == -1 ) perror( STUDENT_FILE_OPEN_FAILED );
+
+	int fileDescriptor_course = open( "course.txt", O_CREAT | O_RDWR, 0777 );
+	if( fileDescriptor_course == -1 ) perror( COURSE_FILE_OPEN_FAILED );
+
+	int fileDescriptor_mapping = open( "mapping.txt", O_CREAT | O_RDWR, 0777 );
+	if( fileDescriptor_mapping == -1 ) perror( MAPPING_FILE_OPEN_FAILED );
+
+	int retval_faculty =
+	          read_faculty_record( fileDescriptor_faculty, &faculty_record, faculty_id, sizeof( struct faculty ) );
+
+	char* read_buffer = ( char* ) malloc( 512 * sizeof( char ) );
+	memset( read_buffer, 0, 512 );
+
+	write( clientSocket, ENTER_COURSE_ID, sizeof( ENTER_COURSE_ID ) );
+	sleep( 1 );
+	int read_course_id_bytes = read( clientSocket, read_buffer, 512 );
+	if( read_course_id_bytes == -1 ) perror( "Could not read course id." );
+	read_buffer[read_course_id_bytes - 1] = '\0';
+
+	char* temp_course_id_buffer = ( char* ) malloc( COURSEID_LENGTH * sizeof( char ) );
+	memset( temp_course_id_buffer, 0, COURSEID_LENGTH );
+	strcpy( temp_course_id_buffer, read_buffer + strlen( read_buffer ) - 3 );
+	write( 1, temp_course_id_buffer, COURSEID_LENGTH );
+	course_id = atoi( temp_course_id_buffer );
+
+	if( course_id == 0 ) { write( clientSocket, ENROLL_COURSEID_EMPTY, sizeof( ENROLL_COURSEID_EMPTY ) ); }
+	else
+	{
+		int retval_course = read_course_record( fileDescriptor_course, &course_record, course_id,
+		                                        sizeof( struct course ) );
+		if( retval_course == 1 )
+		{
+			int flag                    = 1;
+			int check_if_course_offered = 0;
+			for( int i = 0; i < MAX_COURSES_PER_FACULTY; i++ )
+			{
+				if( isRowEmpty( faculty_record.offering_courses, i ) )
+					continue;
+				else
+				{
+					// This means that the faculty is offering at least 1 course.
+					flag = 0;
+					if( !strcmp( faculty_record.offering_courses[i], read_buffer ) )
+					{
+						// Means that the faculty has offered the given course;
+						check_if_course_offered = 1;
+
+						// Memset the field for this course.
+						// Probably I might have to use a semaphore here...
+						memset( &faculty_record.offering_courses[i], 0, COURSEID_LENGTH );
+
+						// I have to decrease the number of courses taken by the student
+						faculty_record.no_of_offering_courses -= 1;
+						write_faculty_record( fileDescriptor_faculty, &faculty_record,
+						                      faculty_id, sizeof( struct faculty ), 1 );
+						break;
+					}
+				}
+			}
+			if( flag == 1 && check_if_course_offered == 0 )
+			{
+				write( clientSocket, NOT_OFFERING_ANY_COURSE_CLIENT,
+				       sizeof( NOT_OFFERING_ANY_COURSE_CLIENT ) );
+				write( 1, NOT_OFFERING_ANY_COURSE_SERVER, sizeof( NOT_OFFERING_ANY_COURSE_SERVER ) );
+				sleep( 1 );
+				write( clientSocket, NOT_OFFERED_THIS_COURSE_CLIENT,
+				       sizeof( NOT_OFFERED_THIS_COURSE_CLIENT ) );
+				write( 1, NOT_OFFERED_THIS_COURSE_SERVER, sizeof( NOT_OFFERED_THIS_COURSE_SERVER ) );
+			}
+			else if( flag == 0 && check_if_course_offered == 0 )
+			{
+				write( clientSocket, OFFERED_ANY_COURSE_CLIENT, sizeof( OFFERED_ANY_COURSE_CLIENT ) );
+				write( 1, OFFERED_ANY_COURSE_SERVER, sizeof( OFFERED_ANY_COURSE_SERVER ) );
+				sleep( 1 );
+				write( clientSocket, NOT_OFFERED_THIS_COURSE_CLIENT,
+				       sizeof( NOT_OFFERED_THIS_COURSE_CLIENT ) );
+				write( 1, NOT_OFFERED_THIS_COURSE_SERVER, sizeof( NOT_OFFERED_THIS_COURSE_SERVER ) );
+			}
+			// Remove the course from the student side
+			int bytesToRead_student;
+			int student_no = 1;
+			while( ( bytesToRead_student = read( fileDescriptor_student, &student_record,
+			                                     sizeof( struct student ) ) ) > 0 )
+			{
+				// We have reached the EOF
+				if( bytesToRead_student != sizeof( struct student ) ) { perror( STUDENT_RECORD_EOF ); }
+
+				for( int i = 0; i < MAX_COURSES_PER_STUDENT; i++ )
+				{
+					if( isRowEmpty( student_record.enrolled_courses, i ) )
+						continue;
+					else
+					{
+						if( !strcmp( student_record.enrolled_courses[i], read_buffer ) )
+						{
+							// Memset the field for this course.
+							// Probably I might have to use a semaphore here...
+							memset( &student_record.enrolled_courses[i], 0,
+							        COURSEID_LENGTH );
+							// I have to decrease the number of courses taken by the student
+							student_record.number_of_courses_taken -= 1;
+							write_student_record( fileDescriptor_student, &student_record,
+							                      student_no, sizeof( struct student ), 1 );
+							break;
+						}
+					}
+				}
+				student_no++;
+			}
+
+			// Remove the Mappings
+			int bytesToRead_mapping;
+			int mapping_no = 0;
+			while( ( bytesToRead_mapping = read( fileDescriptor_mapping, &mapping_record,
+			                                     sizeof( struct mapping ) ) ) > 0 )
+			{
+				// We have reached the EOF
+				if( bytesToRead_mapping != sizeof( struct course ) ) { perror( MAPPING_RECORD_EOF ); }
+
+				if( mapping_record.course_id == course_id )
+				{
+					// Memset the entire structure.
+
+					memset( &mapping_record, 0, sizeof( struct mapping ) );
+					write_mapping_record( fileDescriptor_mapping, &mapping_record, mapping_no + 1,
+					                      sizeof( struct mapping ), 1 );
+				}
+				mapping_no++;
+			}
+
+			// We need to memset the fields in the course record;
+			memset( &course_record, 0, sizeof( struct course ) );
+			write_course_record( fileDescriptor_course, &course_record, course_id, sizeof( struct course ),
+			                     1 );
+			sleep( 1 );
+			write( clientSocket, SUCCESSFULLY_REMOVED_COURSE, sizeof( SUCCESSFULLY_REMOVED_COURSE ) );
+			write( 1, SUCCESSFULLY_REMOVED_COURSE, sizeof( SUCCESSFULLY_REMOVED_COURSE ) );
+		}
+		else
+		{
+			// The course was not found...
+			write( clientSocket, COURSE_RECORD_NOT_FOUND, sizeof( COURSE_RECORD_NOT_FOUND ) );
+		}
+	}
+	free( read_buffer );
+	close( fileDescriptor_course );
+	close( fileDescriptor_faculty );
+	close( fileDescriptor_mapping );
+	close( fileDescriptor_student );
+}
+
+void view_offering_courses( int clientSocket, int faculty_id )
+{
+	struct faculty faculty_record;
+	struct course course_record;
+
+	char* read_buffer = ( char* ) malloc( 512 * sizeof( char ) );
+	memset( read_buffer, 0, 512 );
+
+	int fileDescriptor_faculty = open( "faculty.txt", O_CREAT | O_RDONLY, 0777 );
+	if( fileDescriptor_faculty == -1 ) perror( FACULTY_FILE_OPEN_FAILED );
+	int fileDescriptor_course = open( "course.txt", O_CREAT | O_RDONLY, 0777 );
+	if( fileDescriptor_course == -1 ) perror( COURSE_FILE_OPEN_FAILED );
+
+	int retval_student =
+	          read_faculty_record( fileDescriptor_faculty, &faculty_record, faculty_id, sizeof( struct faculty ) );
+
+	int flag = 1;
+	for( int i = 0; i < MAX_COURSES_PER_FACULTY; i++ )
+	{
+		if( isRowEmpty( faculty_record.offering_courses, i ) )
+			continue;
+		else
+		{
+			// This means that the faculty is offering at least 1 course.
+			flag = 0;
+
+			// We now have to show the course details...
+			char* temp_course_id_buffer = ( char* ) malloc( COURSEID_LENGTH * sizeof( char ) );
+			memset( temp_course_id_buffer, 0, COURSEID_LENGTH );
+			strcpy( temp_course_id_buffer,
+			        faculty_record.offering_courses[i] + strlen( faculty_record.offering_courses[i] ) - 3 );
+			int course_id = atoi( temp_course_id_buffer );
+			free( temp_course_id_buffer );
+
+			int retval_course = read_course_record( fileDescriptor_course, &course_record, course_id,
+			                                        sizeof( struct course ) );
+			if( retval_course == 1 )
+			{
+				// Show course details here..
+				// Course Name
+				strcat( read_buffer, "Course Name : " );
+				strcat( read_buffer, course_record.course_name );
+				strcat( read_buffer, "\n" );
+				write( clientSocket, read_buffer, strlen( read_buffer ) );
+				memset( read_buffer, 0, 512 );
+
+				// Course ID
+				strcat( read_buffer, "Course ID : " );
+				strcat( read_buffer, course_record.course_id );
+				strcat( read_buffer, "\n" );
+				write( clientSocket, read_buffer, strlen( read_buffer ) );
+				memset( read_buffer, 0, 512 );
+
+				// Course Department
+				strcat( read_buffer, "Department : " );
+				strcat( read_buffer, course_record.department );
+				strcat( read_buffer, "\n" );
+				write( clientSocket, read_buffer, strlen( read_buffer ) );
+				memset( read_buffer, 0, 512 );
+
+				// Course Credits
+				strcat( read_buffer, "Credits : " );
+				char* temp_buffer_credits = ( char* ) malloc( 10 * sizeof( char ) );
+				snprintf( temp_buffer_credits, 10, "%d", course_record.credits );
+				strcat( read_buffer, temp_buffer_credits );
+				strcat( read_buffer, "\n" );
+				write( clientSocket, read_buffer, strlen( read_buffer ) );
+				free( temp_buffer_credits );
+				memset( read_buffer, 0, 512 );
+
+				// Course Total No. Of Seats
+				strcat( read_buffer, "Total No. Of Seats : " );
+				char* temp_buffer_total_seats = ( char* ) malloc( 10 * sizeof( char ) );
+				snprintf( temp_buffer_total_seats, 10, "%d", course_record.total_number_of_seats );
+				strcat( read_buffer, temp_buffer_total_seats );
+				strcat( read_buffer, "\n" );
+				write( clientSocket, read_buffer, strlen( read_buffer ) );
+				free( temp_buffer_total_seats );
+				memset( read_buffer, 0, 512 );
+
+				// Course Total No. Of Available Seats
+				strcat( read_buffer, "Total No. Of Available Seats : " );
+				char* temp_buffer_total_available_seats = ( char* ) malloc( 10 * sizeof( char ) );
+				snprintf( temp_buffer_total_available_seats, 10, "%d",
+				          course_record.number_of_available_seats );
+				strcat( read_buffer, temp_buffer_total_available_seats );
+				strcat( read_buffer, "\n" );
+				strcat( read_buffer, "\n" );
+				write( clientSocket, read_buffer, strlen( read_buffer ) );
+				free( temp_buffer_total_available_seats );
+				memset( read_buffer, 0, 512 );
+			}
+			else
+			{
+				// The course was not found...
+				write( clientSocket, COURSE_RECORD_NOT_FOUND, sizeof( COURSE_RECORD_NOT_FOUND ) );
+			}
+		}
+	}
+	if( flag == 1 )
+	{
+		write( clientSocket, NOT_OFFERING_ANY_COURSE_CLIENT, sizeof( NOT_OFFERING_ANY_COURSE_CLIENT ) );
+		write( 1, NOT_OFFERING_ANY_COURSE_SERVER, sizeof( NOT_OFFERING_ANY_COURSE_SERVER ) );
+	}
+	free( read_buffer );
+	close( fileDescriptor_course );
+	close( fileDescriptor_faculty );
+}
 
 void add_new_course( int clientSocket, int faculty_id )
 {
@@ -313,6 +582,7 @@ void faculty_menu_handler( int clientSocket, int faculty_id )
 
 void faculty_connection_handler( int clientSocket )
 {
+	loadVariablesFromFile();
 	char *username_buffer, *password_buffer;
 	struct faculty record;
 	username_buffer    = ( char* ) malloc( USERNAME_LENGTH * sizeof( char ) );

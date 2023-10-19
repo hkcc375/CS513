@@ -124,10 +124,40 @@ int isRowEmpty( const char array[][COURSEID_LENGTH], int row )
 	return memcmp( array[row], emptyRow, COURSEID_LENGTH ) == 0; // Compare the row with an empty row
 }
 
-int isStructEmpty( const struct mapping* s )
-{
-	struct mapping mapping_record;
-	memset( &mapping_record, 0, sizeof( struct mapping ) );
+// int isStructEmpty( const struct mapping* s )
+// {
+// 	struct mapping mapping_record;
+// 	memset( &mapping_record, 0, sizeof( struct mapping ) );
 
-	return memcmp( s, &mapping_record, sizeof( struct mapping ) ) == 0;
+// 	return memcmp( s, &mapping_record, sizeof( struct mapping ) ) == 0;
+// }
+
+void saveVariablesToFile()
+{
+	int fileDescriptor = open( "globals.txt", O_CREAT | O_WRONLY, 0777 );
+	if( fileDescriptor == -1 )
+	{
+		perror( "Error opening file for writing" );
+		return;
+	}
+	write( fileDescriptor, &no_of_students, sizeof( int ) );
+	write( fileDescriptor, &no_of_faculty, sizeof( int ) );
+	write( fileDescriptor, &no_of_courses, sizeof( int ) );
+	write( fileDescriptor, &no_of_mappings, sizeof( int ) );
+	close( fileDescriptor );
+}
+
+void loadVariablesFromFile()
+{
+	int fileDescriptor = open( "globals.txt", O_RDONLY );
+	if( fileDescriptor == -1 )
+	{
+		perror( "Error opening file for reading" );
+		return;
+	}
+	read( fileDescriptor, &no_of_students, sizeof( int ) );
+	read( fileDescriptor, &no_of_faculty, sizeof( int ) );
+	read( fileDescriptor, &no_of_courses, sizeof( int ) );
+	read( fileDescriptor, &no_of_mappings, sizeof( int ) );
+	close( fileDescriptor );
 }

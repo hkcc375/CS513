@@ -146,6 +146,17 @@ extern int no_of_mappings;
 #define NOT_ENROLLED_ANY_COURSE_SERVER "The student has not enrolled for any courses. \n"
 #define NOT_ENROLLED_THIS_COURSE_SERVER "The student has not enrolled for this course. Cannot perform Drop Course. \n"
 
+#define NOT_OFFERING_ANY_COURSE_SERVER "The faculty is not offering any course. \n"
+#define NOT_OFFERING_ANY_COURSE_CLIENT "You are not offering any courses right now. \n"
+#define NOT_OFFERED_THIS_COURSE_CLIENT "You have not offered this course. Cannot perform Remove Course. \n"
+#define NOT_OFFERED_THIS_COURSE_SERVER "The faculty is not offering this course. Cannot perform Remove Course. \n"
+#define OFFERED_ANY_COURSE_CLIENT "You have offered at least 1 course. \n"
+#define OFFERED_ANY_COURSE_SERVER "The faculty has offered this course. \n"
+
+#define REMOVED_MAPPING_COURSE_CLIENT "Successfully removed the student -> course mapping. \n"
+#define REMOVED_MAPPING_COURSE_SERVER "Removed student -> course mapping. \n"
+#define SUCCESSFULLY_REMOVED_COURSE "Successfully removed the course. \n"
+
 #define SUCCESSFULLY_COURSE_DROPPED_CLIENT "You have successfully dropped the course. \n"
 #define SUCCESSFULLY_COURSE_DROPPED_SERVER "The student has successfully dropped the course. \n"
 

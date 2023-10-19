@@ -11,7 +11,7 @@ server.o: server.c admin.h faculty.h student.h server_constants.h socket_constan
 admin.o: admin.c admin.h server_constants.h faculty.h socket_constants.h student.h common.c common.h
 	gcc -c admin.c
 
-student.o: student.c student.h
+student.o: student.c student.h common.h server_constants.h socket_constants.h course.h
 	gcc -c student.c
 
 faculty.o: faculty.c faculty.h course.h common.h server_constants.h socket_constants.h

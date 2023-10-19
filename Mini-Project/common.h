@@ -19,6 +19,8 @@ void write_course_record( int fileDescriptor, struct course* record, int record_
 void write_mapping_record( int fileDescriptor, struct mapping* record, int record_indx, int record_size, int flag );
 
 int isRowEmpty( const char array[][COURSEID_LENGTH], int row );
-int isStructEmpty( const struct mapping* s );
+// int isStructEmpty( const struct mapping* s );
+void saveVariablesToFile();
+void loadVariablesFromFile();
 
 #endif

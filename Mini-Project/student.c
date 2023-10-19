@@ -596,6 +596,7 @@ void logout_and_exit_student() { return; }
 
 void student_connection_handler( int clientSocket )
 {
+	loadVariablesFromFile();
 	char *username_buffer, *password_buffer;
 	struct student record;
 	username_buffer    = ( char* ) malloc( USERNAME_LENGTH * sizeof( char ) );
