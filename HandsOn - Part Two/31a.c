@@ -1,0 +1,42 @@
+#include <stdio.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+int main()
+{
+	key_t semKey;
+	int semIndentifier;
+	int semctlStatus;
+
+	union semun
+	{
+		int val;
+	} semSet;
+
+	semKey = ftok( ".", 1 );
+	if( semKey == -1 )
+	{
+		perror( "Error while computing key!" );
+		_exit( 1 );
+	}
+
+	semIndentifier = semget( semKey, 1, IPC_CREAT | 0777 );
+
+	if( semIndentifier == -1 )
+	{
+		perror( "Error while creating semaphore!" );
+		_exit( 1 );
+	}
+
+	semSet.val = 1;
+
+	semctlStatus = semctl( semIndentifier, 0, SETVAL, semSet );
+
+	if( semctlStatus == -1 )
+	{
+		perror( "Error while initalizing semaphore!" );
+		_exit( 0 );
+	}
+}
