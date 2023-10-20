@@ -17,7 +17,6 @@
 int no_of_students = 0;
 int no_of_faculty  = 0;
 int no_of_courses  = 0;
-int no_of_mappings = 0;
 
 void reap_child_process( int signal );
 
@@ -109,18 +108,9 @@ int main( int argc, char const* argv[] )
 						int userChoice = atoi( read_buffer );
 						switch( userChoice )
 						{
-						case 1:
-							admin_connection_handler( clientSocket );
-							saveVariablesToFile();
-							break;
-						case 2:
-							faculty_connection_handler( clientSocket );
-							saveVariablesToFile();
-							break;
-						case 3:
-							student_connection_handler( clientSocket );
-							saveVariablesToFile();
-							break;
+						case 1: admin_connection_handler( clientSocket ); break;
+						case 2: faculty_connection_handler( clientSocket ); break;
+						case 3: student_connection_handler( clientSocket ); break;
 						default: break;
 						}
 					}

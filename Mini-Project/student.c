@@ -68,7 +68,6 @@ void drop_course( int clientSocket, int student_id )
 						check_if_course_enrolled = 1;
 
 						// Memset the field for this course.
-						// Probably I might have to use a semaphore here...
 						memset( &student_record.enrolled_courses[i], 0, COURSEID_LENGTH );
 						// I have to decrease the number of courses taken by the student
 						student_record.number_of_courses_taken -= 1;
@@ -126,7 +125,6 @@ void drop_course( int clientSocket, int student_id )
 				                      sizeof( struct mapping ), 1 );
 
 				// Now increase the number of available seats by 1.
-				// Definetely have to use semaphore here..
 				course_record.number_of_available_seats += 1;
 				write_course_record( fileDescriptor_course, &course_record, course_id,
 				                     sizeof( struct course ), 1 );
@@ -272,127 +270,128 @@ void enroll_course( int clientSocket, int student_id )
 
 		int retval_course = read_course_record( fileDescriptor_course, &course_record, course_id,
 		                                        sizeof( struct course ) );
-
-		if( student_record.number_of_courses_taken < MAX_COURSES_PER_STUDENT )
+		if( retval_course == 1 )
 		{
-			int flag  = 1;
-			int index = 0;
-
-			// This means that the student has taken
-			// less number of courses than the
-			// MAX_COURSES_PER_STUDENT
-
-			for( int i = 0; i < MAX_COURSES_PER_STUDENT; i++ )
+			if( student_record.number_of_courses_taken < MAX_COURSES_PER_STUDENT )
 			{
-				if( isRowEmpty( student_record.enrolled_courses, i ) )
-				{
-					index = i;
-					break;
-				}
-			}
+				int flag  = 1;
+				int index = 0;
 
-			for( int i = 0; i < MAX_COURSES_PER_STUDENT; i++ )
-			{
-				write( 1, student_record.enrolled_courses[i],
-				       sizeof( student_record.enrolled_courses[i] ) );
-				if( !strcmp( student_record.enrolled_courses[i], read_buffer ) )
-				{
-					flag = 0;
-					sleep( 1 );
-					// This means that
-					// the student has
-					// already enrolled
-					// to this course
-					write( clientSocket, COURSE_ALREADY_ENROLLED_CLIENT,
-					       sizeof( COURSE_ALREADY_ENROLLED_CLIENT ) );
-					write( 1, COURSE_ALREADY_ENROLLED_SERVER,
-					       sizeof( COURSE_ALREADY_ENROLLED_SERVER ) );
-					break;
-				}
-			}
-			if( flag == 1 )
-			{
-				// This means that the student
-				// has not enrolled to this
-				// course && he has taken no.
-				// of courses less than
+				// This means that the student has taken
+				// less number of courses than the
 				// MAX_COURSES_PER_STUDENT
-				if( retval_course == 1 )
+
+				for( int i = 0; i < MAX_COURSES_PER_STUDENT; i++ )
 				{
-					if( course_record.number_of_available_seats == 0 )
+					if( isRowEmpty( student_record.enrolled_courses, i ) )
 					{
+						index = i;
+						break;
+					}
+				}
+
+				for( int i = 0; i < MAX_COURSES_PER_STUDENT; i++ )
+				{
+					write( 1, student_record.enrolled_courses[i],
+					       sizeof( student_record.enrolled_courses[i] ) );
+					if( !strcmp( student_record.enrolled_courses[i], read_buffer ) )
+					{
+						flag = 0;
 						sleep( 1 );
-						write( clientSocket, CANNOT_ENROLL_COURSE_MAX_LIMIT_REACHED_STUDENT,
-						       sizeof( CANNOT_ENROLL_COURSE_MAX_LIMIT_REACHED_STUDENT ) );
+						// This means that
+						// the student has
+						// already enrolled
+						// to this course
+						write( clientSocket, COURSE_ALREADY_ENROLLED_CLIENT,
+						       sizeof( COURSE_ALREADY_ENROLLED_CLIENT ) );
+						write( 1, COURSE_ALREADY_ENROLLED_SERVER,
+						       sizeof( COURSE_ALREADY_ENROLLED_SERVER ) );
+						break;
+					}
+				}
+				if( flag == 1 )
+				{
+					// This means that the student
+					// has not enrolled to this
+					// course && he has taken no.
+					// of courses less than
+					// MAX_COURSES_PER_STUDENT
+					if( retval_course == 1 )
+					{
+						if( course_record.number_of_available_seats == 0 )
+						{
+							sleep( 1 );
+							write( clientSocket,
+							       CANNOT_ENROLL_COURSE_MAX_LIMIT_REACHED_STUDENT,
+							       sizeof( CANNOT_ENROLL_COURSE_MAX_LIMIT_REACHED_STUDENT ) );
+						}
+						else
+						{
+							// We need
+							// to
+							// modify
+							// the
+							// course
+							// details
+							// such as
+							// no. of
+							// available
+							// seats
+							// Write
+							// the
+							// structure
+							// to the
+							// mapping
+							// file.
+							course_record.number_of_available_seats -= 1;
+
+							write_course_record( fileDescriptor_course, &course_record,
+							                     course_id, sizeof( course ), 1 );
+							write( 1, COURSE_RECORD_MODIFIED,
+							       sizeof( COURSE_RECORD_MODIFIED ) );
+
+							mapping_record.course_id  = course_id;
+							mapping_record.student_id = student_id;
+							write_mapping_record( fileDescriptor_mapping, &mapping_record,
+							                      0, sizeof( struct mapping ), 0 );
+						}
 					}
 					else
 					{
-						// We need
-						// to
-						// modify
-						// the
-						// course
-						// details
-						// such as
-						// no. of
-						// available
-						// seats
-						// Write
-						// the
-						// structure
-						// to the
-						// mapping
-						// file.
-
-						// Maybe I
-						// have to
-						// apply
-						// semaphore..
-						course_record.number_of_available_seats -= 1;
-
-						write_course_record( fileDescriptor_course, &course_record, course_id,
-						                     sizeof( course ), 1 );
-						write( 1, COURSE_RECORD_MODIFIED, sizeof( COURSE_RECORD_MODIFIED ) );
-
-						mapping_record.course_id  = course_id;
-						mapping_record.student_id = student_id;
-						write_mapping_record( fileDescriptor_mapping, &mapping_record, 0,
-						                      sizeof( struct mapping ), 0 );
+						// Course record was
+						// not found..
+						write( clientSocket, COURSE_RECORD_NOT_FOUND,
+						       sizeof( COURSE_RECORD_NOT_FOUND ) );
 					}
-				}
-				else
-				{
-					// Course record was
-					// not found..
-					write( clientSocket, COURSE_RECORD_NOT_FOUND,
-					       sizeof( COURSE_RECORD_NOT_FOUND ) );
-				}
-				// Modifying student enrolled course details ..
-				// strcpy( &student_record.enrolled_courses
-				//                    [student_record.number_of_courses_taken -
-				//                    1] [COURSEID_LENGTH],
-				//         course_record.course_id );
-				student_record.number_of_courses_taken++;
-				strcpy( &student_record.enrolled_courses[index - 1][COURSEID_LENGTH],
-				        course_record.course_id );
+					// Modifying student enrolled course details ..
+					// strcpy( &student_record.enrolled_courses
+					//                    [student_record.number_of_courses_taken -
+					//                    1] [COURSEID_LENGTH],
+					//         course_record.course_id );
+					student_record.number_of_courses_taken++;
+					strcpy( &student_record.enrolled_courses[index - 1][COURSEID_LENGTH],
+					        course_record.course_id );
 
-				write_student_record( fileDescriptor_student, &student_record, student_id,
-				                      sizeof( struct student ), 1 );
-				write( 1, STUDENT_RECORD_MODIFIED, sizeof( STUDENT_RECORD_MODIFIED ) );
-				sleep( 1 );
-				write( clientSocket, ENROLL_COURSE_SUCCESSFUL_CLIENT,
-				       sizeof( ENROLL_COURSE_SUCCESSFUL_CLIENT ) );
+					write_student_record( fileDescriptor_student, &student_record, student_id,
+					                      sizeof( struct student ), 1 );
+					write( 1, STUDENT_RECORD_MODIFIED, sizeof( STUDENT_RECORD_MODIFIED ) );
+					sleep( 1 );
+					write( clientSocket, ENROLL_COURSE_SUCCESSFUL_CLIENT,
+					       sizeof( ENROLL_COURSE_SUCCESSFUL_CLIENT ) );
 
-				write( 1, ENROLL_COURSE_SUCCESSFUL_SERVER, sizeof( ENROLL_COURSE_SUCCESSFUL_SERVER ) );
+					write( 1, ENROLL_COURSE_SUCCESSFUL_SERVER,
+					       sizeof( ENROLL_COURSE_SUCCESSFUL_SERVER ) );
+				}
+			}
+			else
+			{
+				// Student has enrolled for
+				// MAX_COURSES_PER_STUDENT. He cant
+				// enroll for more courses.
+				write( clientSocket, CANNOT_ENROLL_COURSE, sizeof( CANNOT_ENROLL_COURSE ) );
 			}
 		}
-		else
-		{
-			// Student has enrolled for
-			// MAX_COURSES_PER_STUDENT. He cant
-			// enroll for more courses.
-			write( clientSocket, CANNOT_ENROLL_COURSE, sizeof( CANNOT_ENROLL_COURSE ) );
-		}
+		else { write( clientSocket, COURSE_RECORD_NOT_FOUND, sizeof( COURSE_RECORD_NOT_FOUND ) ); }
 	}
 	free( read_buffer );
 	free( temp_course_id_buffer );
@@ -411,13 +410,17 @@ void view_all_courses( int clientSocket, int student_id )
 		perror( COURSE_FILE_OPEN_FAILED );
 	else
 	{
-		int bytesToRead;
-		while( ( bytesToRead = read( fileDescriptor, &record, sizeof( struct course ) ) ) > 0 )
+		int bytesToRead_course;
+		while( ( bytesToRead_course = read( fileDescriptor, &record, sizeof( struct course ) ) ) > 0 )
 		{
 			// We have reached the EOF
-			if( bytesToRead != sizeof( struct course ) ) { perror( COURSE_RECORD_EOF ); }
+			if( bytesToRead_course != sizeof( struct student ) ) { perror( COURSE_RECORD_EOF ); }
+
+			if( isStructEmpty( &record ) )
+				continue;
 			else
 			{
+				// Show course details here..
 				// Course Name
 				strcat( read_buffer, "Course Name : " );
 				strcat( read_buffer, record.course_name );
@@ -461,14 +464,14 @@ void view_all_courses( int clientSocket, int student_id )
 
 				// Course Total No. Of Available Seats
 				strcat( read_buffer, "Total No. Of Available Seats : " );
-				char* temp_buffer_total_seats_available = ( char* ) malloc( 10 * sizeof( char ) );
-				snprintf( temp_buffer_total_seats_available, 10, "%d",
+				char* temp_buffer_total_available_seats = ( char* ) malloc( 10 * sizeof( char ) );
+				snprintf( temp_buffer_total_available_seats, 10, "%d",
 				          record.number_of_available_seats );
-				strcat( read_buffer, temp_buffer_total_seats_available );
+				strcat( read_buffer, temp_buffer_total_available_seats );
 				strcat( read_buffer, "\n" );
 				strcat( read_buffer, "\n" );
 				write( clientSocket, read_buffer, strlen( read_buffer ) );
-				free( temp_buffer_total_seats_available );
+				free( temp_buffer_total_available_seats );
 				memset( read_buffer, 0, 512 );
 			}
 		}
@@ -568,10 +571,26 @@ void student_menu_handler( int clientSocket, int student_id )
 			{
 				switch( userChoice )
 				{
-				case 1: enroll_course( clientSocket, student_id ); break;
-				case 2: drop_course( clientSocket, student_id ); break;
-				case 3: view_all_courses( clientSocket, student_id ); break;
-				case 4: view_enrolled_courses( clientSocket, student_id ); break;
+				case 1:
+					loadVariablesFromFile();
+					enroll_course( clientSocket, student_id );
+					saveVariablesToFile();
+					break;
+				case 2:
+					loadVariablesFromFile();
+					drop_course( clientSocket, student_id );
+					saveVariablesToFile();
+					break;
+				case 3:
+					loadVariablesFromFile();
+					view_all_courses( clientSocket, student_id );
+					saveVariablesToFile();
+					break;
+				case 4:
+					loadVariablesFromFile();
+					view_enrolled_courses( clientSocket, student_id );
+					saveVariablesToFile();
+					break;
 				case 5: change_password_student( clientSocket, student_id ); break;
 				case 6:
 					logout_and_exit_student();

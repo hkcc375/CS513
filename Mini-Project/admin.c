@@ -11,10 +11,6 @@
 #include "socket_constants.h"
 #include "student.h"
 
-// Maybe I will have to maintain this in another file.
-// int no_of_students = 0;
-// int no_of_faculty  = 0;
-
 void modify_faculty_details( int clientSocket )
 {
 	struct faculty record;
@@ -268,8 +264,6 @@ void add_faculty( int clientSocket )
 			strcpy( new_faculty.password, "faculty" );
 
 			// Faculty ID
-			// Apply Semaphores here... OR maintain the details in
-			// another file...
 			no_of_faculty++;
 
 			// Username
@@ -402,9 +396,6 @@ void activate_student( int clientSocket )
 			if( retval == 1 )
 			{
 				memset( read_buffer, 0, 512 );
-
-				// Probably, we might have to apply semaphore
-				// here.
 				record.status = 1;
 
 				write_student_record( fileDescriptor, &record, student_id, sizeof( student ), 1 );
@@ -448,8 +439,6 @@ void block_student( int clientSocket )
 			{
 				memset( read_buffer, 0, 512 );
 
-				// Probably, we might have to apply semaphore
-				// here.
 				record.status = 0;
 
 				write_student_record( fileDescriptor, &record, student_id, sizeof( student ), 1 );
@@ -616,8 +605,6 @@ void add_student( int clientSocket )
 			new_student.status = 1;
 
 			// Student ID
-			// Apply Semaphores here... OR maintain the details in
-			// another file...
 			no_of_students++;
 
 			// Username
@@ -662,9 +649,17 @@ void admin_menu_handler( int clientSocket )
 			{
 				switch( userChoice )
 				{
-				case 1: add_student( clientSocket ); break;
+				case 1:
+					loadVariablesFromFile();
+					add_student( clientSocket );
+					saveVariablesToFile();
+					break;
 				case 2: view_student_details( clientSocket ); break;
-				case 3: add_faculty( clientSocket ); break;
+				case 3:
+					loadVariablesFromFile();
+					add_faculty( clientSocket );
+					saveVariablesToFile();
+					break;
 				case 4: view_faculty_details( clientSocket ); break;
 				case 5: activate_student( clientSocket ); break;
 				case 6: block_student( clientSocket ); break;
@@ -691,7 +686,6 @@ void admin_menu_handler( int clientSocket )
 
 void admin_connection_handler( int clientSocket )
 {
-	loadVariablesFromFile();
 	char *username_buffer, *password_buffer;
 	username_buffer = ( char* ) malloc( 16 * sizeof( char ) );
 	password_buffer = ( char* ) malloc( 16 * sizeof( char ) );

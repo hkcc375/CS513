@@ -1,4 +1,5 @@
 #include <fcntl.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -124,13 +125,13 @@ int isRowEmpty( const char array[][COURSEID_LENGTH], int row )
 	return memcmp( array[row], emptyRow, COURSEID_LENGTH ) == 0; // Compare the row with an empty row
 }
 
-// int isStructEmpty( const struct mapping* s )
-// {
-// 	struct mapping mapping_record;
-// 	memset( &mapping_record, 0, sizeof( struct mapping ) );
+int isStructEmpty( const struct course* s )
+{
+	struct course course_record;
+	memset( &course_record, 0, sizeof( struct course ) );
 
-// 	return memcmp( s, &mapping_record, sizeof( struct mapping ) ) == 0;
-// }
+	return memcmp( s, &course_record, sizeof( struct course ) ) == 0;
+}
 
 void saveVariablesToFile()
 {
@@ -143,7 +144,6 @@ void saveVariablesToFile()
 	write( fileDescriptor, &no_of_students, sizeof( int ) );
 	write( fileDescriptor, &no_of_faculty, sizeof( int ) );
 	write( fileDescriptor, &no_of_courses, sizeof( int ) );
-	write( fileDescriptor, &no_of_mappings, sizeof( int ) );
 	close( fileDescriptor );
 }
 
@@ -158,6 +158,5 @@ void loadVariablesFromFile()
 	read( fileDescriptor, &no_of_students, sizeof( int ) );
 	read( fileDescriptor, &no_of_faculty, sizeof( int ) );
 	read( fileDescriptor, &no_of_courses, sizeof( int ) );
-	read( fileDescriptor, &no_of_mappings, sizeof( int ) );
 	close( fileDescriptor );
 }

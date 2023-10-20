@@ -19,7 +19,6 @@
 extern int no_of_students;
 extern int no_of_faculty;
 extern int no_of_courses;
-extern int no_of_mappings;
 
 // Role Based Prompts
 #define INITIAL_PROMPT                                                                                                 \
