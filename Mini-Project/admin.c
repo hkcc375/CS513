@@ -36,8 +36,23 @@ void modify_faculty_details( int clientSocket )
 		}
 		else
 		{
+			struct flock lock;
+			lock.l_pid    = getpid();
+			lock.l_whence = SEEK_SET;
+			lock.l_start  = ( faculty_id - 1 ) * sizeof( struct faculty );
+			lock.l_type   = F_RDLCK;
+			lock.l_len    = sizeof( struct faculty );
+			fcntl( fileDescriptor, F_SETLKW, &lock );
+
 			int retval =
 			          read_faculty_record( fileDescriptor, &record, faculty_id, sizeof( struct faculty ) );
+
+			lock.l_type = F_UNLCK;
+			fcntl( fileDescriptor, F_SETLKW, &lock );
+
+			lock.l_type = F_WRLCK;
+			fcntl( fileDescriptor, F_SETLKW, &lock );
+
 			if( retval == 1 )
 			{
 				memset( read_buffer, 0, 512 );
@@ -102,6 +117,9 @@ void modify_faculty_details( int clientSocket )
 				write( clientSocket, FACULTY_RECORD_MODIFIED, sizeof( FACULTY_RECORD_MODIFIED ) );
 			}
 			else { write( clientSocket, FACULTY_RECORD_NOT_FOUND, sizeof( FACULTY_RECORD_NOT_FOUND ) ); }
+
+			lock.l_type = F_UNLCK;
+			fcntl( fileDescriptor, F_SETLKW, &lock );
 		}
 	}
 	close( fileDescriptor );
@@ -133,6 +151,14 @@ void view_faculty_details( int clientSocket )
 		}
 		else
 		{
+			struct flock lock;
+			lock.l_pid    = getpid();
+			lock.l_whence = SEEK_SET;
+			lock.l_start  = ( faculty_id - 1 ) * sizeof( struct faculty );
+			lock.l_type   = F_RDLCK;
+			lock.l_len    = sizeof( struct faculty );
+			fcntl( fileDescriptor, F_SETLKW, &lock );
+
 			int retval =
 			          read_faculty_record( fileDescriptor, &record, faculty_id, sizeof( struct faculty ) );
 			if( retval == 1 )
@@ -182,6 +208,9 @@ void view_faculty_details( int clientSocket )
 				memset( read_buffer, 0, 512 );
 			}
 			else { write( clientSocket, FACULTY_RECORD_NOT_FOUND, sizeof( FACULTY_RECORD_NOT_FOUND ) ); }
+
+			lock.l_type = F_UNLCK;
+			fcntl( fileDescriptor, F_SETLKW, &lock );
 		}
 	}
 	close( fileDescriptor );
@@ -190,6 +219,13 @@ void view_faculty_details( int clientSocket )
 
 void add_faculty( int clientSocket )
 {
+	struct flock lock;
+	lock.l_pid    = getpid();
+	lock.l_whence = SEEK_SET;
+	lock.l_start  = 0;
+	lock.l_type   = F_WRLCK;
+	lock.l_len    = 0;
+
 	char* read_buffer;
 	read_buffer = ( char* ) malloc( 512 * sizeof( char ) );
 	memset( read_buffer, 0, 512 );
@@ -201,6 +237,8 @@ void add_faculty( int clientSocket )
 	{
 		if( no_of_faculty < MAX_FACULTY )
 		{
+			fcntl( fileDescriptor, F_SETLKW, &lock );
+
 			struct faculty new_faculty;
 
 			// Name
@@ -273,6 +311,9 @@ void add_faculty( int clientSocket )
 			write( clientSocket, FACULTY_CREATED_SUCCESSFULLY, sizeof( FACULTY_CREATED_SUCCESSFULLY ) );
 
 			write_faculty_record( fileDescriptor, &new_faculty, 0, sizeof( faculty ), 0 );
+
+			lock.l_type = F_UNLCK;
+			fcntl( fileDescriptor, F_SETLKW, &lock );
 		}
 		else { write( clientSocket, CANNOT_ADD_FACULTY, sizeof( CANNOT_ADD_FACULTY ) ); }
 	}
@@ -307,8 +348,25 @@ void modify_student_details( int clientSocket )
 		}
 		else
 		{
+			struct flock lock;
+			lock.l_pid    = getpid();
+			lock.l_whence = SEEK_SET;
+			lock.l_start  = ( student_id - 1 ) * sizeof( struct student );
+			lock.l_type   = F_RDLCK;
+			lock.l_len    = sizeof( struct student );
+			fcntl( fileDescriptor, F_SETLKW, &lock );
+
 			int retval =
 			          read_student_record( fileDescriptor, &record, student_id, sizeof( struct student ) );
+
+			lock.l_type = F_UNLCK;
+			fcntl( fileDescriptor, F_SETLKW, &lock );
+
+			lock.l_type = F_WRLCK;
+			fcntl( fileDescriptor, F_SETLKW, &lock );
+
+			// sleep( 5 );
+
 			if( retval == 1 )
 			{
 				memset( read_buffer, 0, 512 );
@@ -360,6 +418,9 @@ void modify_student_details( int clientSocket )
 				write( clientSocket, STUDENT_RECORD_MODIFIED, sizeof( STUDENT_RECORD_MODIFIED ) );
 			}
 			else { write( clientSocket, STUDENT_RECORD_NOT_FOUND, sizeof( STUDENT_RECORD_NOT_FOUND ) ); }
+
+			lock.l_type = F_UNLCK;
+			fcntl( fileDescriptor, F_SETLKW, &lock );
 		}
 	}
 	close( fileDescriptor );
@@ -391,8 +452,23 @@ void activate_student( int clientSocket )
 		}
 		else
 		{
+			struct flock lock;
+			lock.l_pid    = getpid();
+			lock.l_whence = SEEK_SET;
+			lock.l_start  = ( student_id - 1 ) * sizeof( struct student );
+			lock.l_type   = F_RDLCK;
+			lock.l_len    = sizeof( struct student );
+			fcntl( fileDescriptor, F_SETLKW, &lock );
+
 			int retval =
 			          read_student_record( fileDescriptor, &record, student_id, sizeof( struct student ) );
+
+			lock.l_type = F_UNLCK;
+			fcntl( fileDescriptor, F_SETLKW, &lock );
+
+			lock.l_type = F_WRLCK;
+			fcntl( fileDescriptor, F_SETLKW, &lock );
+
 			if( retval == 1 )
 			{
 				memset( read_buffer, 0, 512 );
@@ -402,6 +478,9 @@ void activate_student( int clientSocket )
 				write( clientSocket, STUDENT_RECORD_ACTIVATED, sizeof( STUDENT_RECORD_ACTIVATED ) );
 			}
 			else { write( clientSocket, STUDENT_RECORD_NOT_FOUND, sizeof( STUDENT_RECORD_NOT_FOUND ) ); }
+
+			lock.l_type = F_UNLCK;
+			fcntl( fileDescriptor, F_SETLKW, &lock );
 		}
 	}
 	close( fileDescriptor );
@@ -433,10 +512,26 @@ void block_student( int clientSocket )
 		}
 		else
 		{
+			struct flock lock;
+			lock.l_pid    = getpid();
+			lock.l_whence = SEEK_SET;
+			lock.l_start  = ( student_id - 1 ) * sizeof( struct student );
+			lock.l_type   = F_RDLCK;
+			lock.l_len    = sizeof( struct student );
+			fcntl( fileDescriptor, F_SETLKW, &lock );
+
 			int retval =
 			          read_student_record( fileDescriptor, &record, student_id, sizeof( struct student ) );
+
+			lock.l_type = F_UNLCK;
+			fcntl( fileDescriptor, F_SETLKW, &lock );
+
+			lock.l_type = F_WRLCK;
+			fcntl( fileDescriptor, F_SETLKW, &lock );
+
 			if( retval == 1 )
 			{
+
 				memset( read_buffer, 0, 512 );
 
 				record.status = 0;
@@ -445,6 +540,9 @@ void block_student( int clientSocket )
 				write( clientSocket, STUDENT_RECORD_BLOCKED, sizeof( STUDENT_RECORD_BLOCKED ) );
 			}
 			else { write( clientSocket, STUDENT_RECORD_NOT_FOUND, sizeof( STUDENT_RECORD_NOT_FOUND ) ); }
+
+			lock.l_type = F_UNLCK;
+			fcntl( fileDescriptor, F_SETLKW, &lock );
 		}
 	}
 	close( fileDescriptor );
@@ -477,6 +575,14 @@ void view_student_details( int clientSocket )
 		}
 		else
 		{
+			struct flock lock;
+			lock.l_pid    = getpid();
+			lock.l_whence = SEEK_SET;
+			lock.l_start  = ( student_id - 1 ) * sizeof( struct student );
+			lock.l_type   = F_RDLCK;
+			lock.l_len    = sizeof( struct student );
+			fcntl( fileDescriptor, F_SETLKW, &lock );
+
 			int retval =
 			          read_student_record( fileDescriptor, &record, student_id, sizeof( struct student ) );
 			if( retval == 1 )
@@ -529,6 +635,9 @@ void view_student_details( int clientSocket )
 				memset( read_buffer, 0, 512 );
 			}
 			else { write( clientSocket, STUDENT_RECORD_NOT_FOUND, sizeof( STUDENT_RECORD_NOT_FOUND ) ); }
+
+			lock.l_type = F_UNLCK;
+			fcntl( fileDescriptor, F_SETLKW, &lock );
 		}
 	}
 	close( fileDescriptor );
@@ -537,6 +646,14 @@ void view_student_details( int clientSocket )
 
 void add_student( int clientSocket )
 {
+
+	struct flock lock;
+	lock.l_pid    = getpid();
+	lock.l_whence = SEEK_SET;
+	lock.l_start  = 0;
+	lock.l_type   = F_WRLCK;
+	lock.l_len    = 0;
+
 	char* read_buffer;
 	read_buffer = ( char* ) malloc( 512 * sizeof( char ) );
 	memset( read_buffer, 0, 512 );
@@ -548,6 +665,8 @@ void add_student( int clientSocket )
 	{
 		if( no_of_students < MAX_STUDENTS )
 		{
+			fcntl( fileDescriptor, F_SETLKW, &lock );
+
 			struct student new_student;
 
 			// Name
@@ -614,6 +733,9 @@ void add_student( int clientSocket )
 			write( clientSocket, STUDENT_CREATED_SUCCESSFULLY, sizeof( STUDENT_CREATED_SUCCESSFULLY ) );
 
 			write_student_record( fileDescriptor, &new_student, 0, sizeof( student ), 0 );
+
+			lock.l_type = F_UNLCK;
+			fcntl( fileDescriptor, F_SETLKW, &lock );
 		}
 		else { write( clientSocket, CANNOT_ADD_STUDENTS, sizeof( CANNOT_ADD_STUDENTS ) ); }
 	}

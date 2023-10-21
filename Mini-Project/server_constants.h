@@ -116,6 +116,7 @@ extern int no_of_courses;
 #define COURSE_INACTIVE "The given student is an inactive student. \n"
 #define COURSE_RECORD_BLOCKED "Student was successfully blocked. \n"
 #define COURSE_RECORD_ACTIVATED "Student was successfully activated. \n"
+#define COURSE_SUCCESSFULLY_UPDATED "The course details are successfully updated. \n"
 
 // Constraints on Faculty, Student and Courses
 #define CANNOT_ADD_FACULTY "There are 50 faculty. Cannot add any more faculty. \n"

@@ -14,6 +14,8 @@
 
 void drop_course( int clientSocket, int student_id )
 {
+	struct flock lock_student, lock_mapping, lock_course;
+
 	struct student student_record;
 	struct course course_record;
 	struct mapping mapping_record;
@@ -30,6 +32,12 @@ void drop_course( int clientSocket, int student_id )
 	int fileDescriptor_course = open( "course.txt", O_CREAT | O_RDWR, 0777 );
 	if( fileDescriptor_student == -1 ) perror( COURSE_FILE_OPEN_FAILED );
 
+	lock_mapping.l_pid    = getpid();
+	lock_mapping.l_whence = SEEK_SET;
+	lock_mapping.l_start  = 0;
+	lock_mapping.l_type   = F_WRLCK;
+	lock_mapping.l_len    = 0;
+
 	write( clientSocket, ENTER_COURSE_ID, sizeof( ENTER_COURSE_ID ) );
 	sleep( 1 );
 	int read_course_id_bytes = read( clientSocket, read_buffer, 512 );
@@ -44,11 +52,31 @@ void drop_course( int clientSocket, int student_id )
 	if( course_id == 0 ) { write( clientSocket, ENROLL_COURSEID_EMPTY, sizeof( ENROLL_COURSEID_EMPTY ) ); }
 	else
 	{
+		lock_student.l_pid    = getpid();
+		lock_student.l_whence = SEEK_SET;
+		lock_student.l_start  = ( student_id - 1 ) * sizeof( struct student );
+		lock_student.l_type   = F_RDLCK;
+		lock_student.l_len    = sizeof( struct student );
+		fcntl( fileDescriptor_student, F_SETLKW, &lock_student );
+
+		lock_course.l_pid    = getpid();
+		lock_course.l_whence = SEEK_SET;
+		lock_course.l_start  = ( course_id - 1 ) * sizeof( struct course );
+		lock_course.l_type   = F_RDLCK;
+		lock_course.l_len    = sizeof( struct course );
+		fcntl( fileDescriptor_course, F_SETLKW, &lock_course );
+
 		int retval_student = read_student_record( fileDescriptor_student, &student_record, student_id,
 		                                          sizeof( struct student ) );
 
+		lock_student.l_type = F_UNLCK;
+		fcntl( fileDescriptor_student, F_SETLKW, &lock_student );
+
 		int retval_course = read_course_record( fileDescriptor_course, &course_record, course_id,
 		                                        sizeof( struct course ) );
+
+		lock_course.l_type = F_UNLCK;
+		fcntl( fileDescriptor_course, F_SETLKW, &lock_course );
 
 		if( retval_course == 1 )
 		{
@@ -67,12 +95,19 @@ void drop_course( int clientSocket, int student_id )
 						// Means that the student has enrolled for the given course;
 						check_if_course_enrolled = 1;
 
+						lock_student.l_type = F_WRLCK;
+						fcntl( fileDescriptor_student, F_SETLKW, &lock_student );
+
 						// Memset the field for this course.
 						memset( &student_record.enrolled_courses[i], 0, COURSEID_LENGTH );
 						// I have to decrease the number of courses taken by the student
 						student_record.number_of_courses_taken -= 1;
 						write_student_record( fileDescriptor_student, &student_record,
 						                      student_id, sizeof( struct student ), 1 );
+
+						lock_student.l_type = F_UNLCK;
+						fcntl( fileDescriptor_student, F_SETLKW, &lock_student );
+
 						break;
 					}
 				}
@@ -98,6 +133,7 @@ void drop_course( int clientSocket, int student_id )
 			}
 			else
 			{
+				fcntl( fileDescriptor_mapping, F_SETLKW, &lock_mapping );
 				// Remove the mapping
 				int bytesToRead;
 				int mapping_no = 0;
@@ -124,10 +160,17 @@ void drop_course( int clientSocket, int student_id )
 				write_mapping_record( fileDescriptor_mapping, &mapping_record, mapping_no + 1,
 				                      sizeof( struct mapping ), 1 );
 
+				lock_mapping.l_type = F_UNLCK;
+				fcntl( fileDescriptor_mapping, F_SETLKW, &lock_mapping );
+
 				// Now increase the number of available seats by 1.
+				lock_course.l_type = F_WRLCK;
+				fcntl( fileDescriptor_course, F_SETLKW, &lock_course );
 				course_record.number_of_available_seats += 1;
 				write_course_record( fileDescriptor_course, &course_record, course_id,
 				                     sizeof( struct course ), 1 );
+				lock_course.l_type = F_UNLCK;
+				fcntl( fileDescriptor_course, F_SETLKW, &lock_course );
 			}
 		}
 		else
@@ -145,6 +188,8 @@ void drop_course( int clientSocket, int student_id )
 
 void view_enrolled_courses( int clientSocket, int student_id )
 {
+	struct flock lock_course, lock_student;
+
 	struct student student_record;
 	struct course course_record;
 
@@ -156,8 +201,18 @@ void view_enrolled_courses( int clientSocket, int student_id )
 	int fileDescriptor_course = open( "course.txt", O_CREAT | O_RDONLY, 0777 );
 	if( fileDescriptor_course == -1 ) perror( COURSE_FILE_OPEN_FAILED );
 
+	lock_student.l_pid    = getpid();
+	lock_student.l_whence = SEEK_SET;
+	lock_student.l_start  = ( student_id - 1 ) * sizeof( struct student );
+	lock_student.l_type   = F_WRLCK;
+	lock_student.l_len    = sizeof( struct student );
+	fcntl( fileDescriptor_student, F_SETLKW, &lock_student );
+
 	int retval_student =
 	          read_student_record( fileDescriptor_student, &student_record, student_id, sizeof( struct student ) );
+
+	lock_student.l_type = F_UNLCK;
+	fcntl( fileDescriptor_student, F_SETLKW, &lock_student );
 
 	int flag = 1;
 	for( int i = 0; i < MAX_COURSES_PER_STUDENT; i++ )
@@ -178,8 +233,19 @@ void view_enrolled_courses( int clientSocket, int student_id )
 			int course_id = atoi( temp_course_id_buffer );
 			free( temp_course_id_buffer );
 
+			lock_course.l_pid    = getpid();
+			lock_course.l_whence = SEEK_SET;
+			lock_course.l_start  = ( course_id - 1 ) * sizeof( struct course );
+			lock_course.l_type   = F_RDLCK;
+			lock_course.l_len    = sizeof( struct course );
+			fcntl( fileDescriptor_course, F_SETLKW, &lock_course );
+
 			int retval_course = read_course_record( fileDescriptor_course, &course_record, course_id,
 			                                        sizeof( struct course ) );
+
+			lock_course.l_type = F_UNLCK;
+			fcntl( fileDescriptor_course, F_SETLKW, &lock_course );
+
 			if( retval_course == 1 )
 			{
 				// Show course details here..
@@ -234,6 +300,9 @@ void view_enrolled_courses( int clientSocket, int student_id )
 
 void enroll_course( int clientSocket, int student_id )
 {
+
+	struct flock lock_student, lock_mapping, lock_course;
+
 	struct student student_record;
 	struct course course_record;
 	struct mapping mapping_record;
@@ -250,6 +319,13 @@ void enroll_course( int clientSocket, int student_id )
 	int fileDescriptor_course = open( "course.txt", O_CREAT | O_RDWR, 0777 );
 	if( fileDescriptor_student == -1 ) perror( COURSE_FILE_OPEN_FAILED );
 
+	lock_mapping.l_pid    = getpid();
+	lock_mapping.l_whence = SEEK_SET;
+	lock_mapping.l_start  = 0;
+	lock_mapping.l_type   = F_WRLCK;
+	lock_mapping.l_len    = 0;
+	fcntl( fileDescriptor_mapping, F_SETLKW, &lock_mapping );
+
 	write( clientSocket, ENTER_COURSE_ID, sizeof( ENTER_COURSE_ID ) );
 	sleep( 1 );
 	int read_course_id_bytes = read( clientSocket, read_buffer, 512 );
@@ -265,11 +341,32 @@ void enroll_course( int clientSocket, int student_id )
 	if( course_id == 0 ) { write( clientSocket, ENROLL_COURSEID_EMPTY, sizeof( ENROLL_COURSEID_EMPTY ) ); }
 	else
 	{
+		lock_student.l_pid    = getpid();
+		lock_student.l_whence = SEEK_SET;
+		lock_student.l_start  = ( student_id - 1 ) * sizeof( struct student );
+		lock_student.l_type   = F_RDLCK;
+		lock_student.l_len    = sizeof( struct student );
+		fcntl( fileDescriptor_student, F_SETLKW, &lock_student );
+
+		lock_course.l_pid    = getpid();
+		lock_course.l_whence = SEEK_SET;
+		lock_course.l_start  = ( course_id - 1 ) * sizeof( struct course );
+		lock_course.l_type   = F_RDLCK;
+		lock_course.l_len    = sizeof( struct course );
+		fcntl( fileDescriptor_course, F_SETLKW, &lock_course );
+
 		int retval_student = read_student_record( fileDescriptor_student, &student_record, student_id,
 		                                          sizeof( struct student ) );
 
+		lock_student.l_type = F_UNLCK;
+		fcntl( fileDescriptor_student, F_SETLKW, &lock_student );
+
 		int retval_course = read_course_record( fileDescriptor_course, &course_record, course_id,
 		                                        sizeof( struct course ) );
+
+		lock_course.l_type = F_UNLCK;
+		fcntl( fileDescriptor_course, F_SETLKW, &lock_course );
+
 		if( retval_course == 1 )
 		{
 			if( student_record.number_of_courses_taken < MAX_COURSES_PER_STUDENT )
@@ -343,17 +440,30 @@ void enroll_course( int clientSocket, int student_id )
 							// to the
 							// mapping
 							// file.
+
+							lock_course.l_type = F_WRLCK;
+							fcntl( fileDescriptor_course, F_SETLKW, &lock_course );
+
 							course_record.number_of_available_seats -= 1;
 
 							write_course_record( fileDescriptor_course, &course_record,
 							                     course_id, sizeof( course ), 1 );
+
+							lock_course.l_type = F_UNLCK;
+							fcntl( fileDescriptor_course, F_SETLKW, &lock_course );
+
 							write( 1, COURSE_RECORD_MODIFIED,
 							       sizeof( COURSE_RECORD_MODIFIED ) );
+
+							fcntl( fileDescriptor_mapping, F_SETLKW, &lock_mapping );
 
 							mapping_record.course_id  = course_id;
 							mapping_record.student_id = student_id;
 							write_mapping_record( fileDescriptor_mapping, &mapping_record,
 							                      0, sizeof( struct mapping ), 0 );
+
+							lock_mapping.l_type = F_UNLCK;
+							fcntl( fileDescriptor_mapping, F_SETLKW, &lock_mapping );
 						}
 					}
 					else
@@ -368,12 +478,20 @@ void enroll_course( int clientSocket, int student_id )
 					//                    [student_record.number_of_courses_taken -
 					//                    1] [COURSEID_LENGTH],
 					//         course_record.course_id );
+
+					lock_student.l_type = F_WRLCK;
+					fcntl( fileDescriptor_student, F_SETLKW, &lock_student );
+
 					student_record.number_of_courses_taken++;
 					strcpy( &student_record.enrolled_courses[index - 1][COURSEID_LENGTH],
 					        course_record.course_id );
 
 					write_student_record( fileDescriptor_student, &student_record, student_id,
 					                      sizeof( struct student ), 1 );
+
+					lock_student.l_type = F_UNLCK;
+					fcntl( fileDescriptor_student, F_SETLKW, &lock_student );
+
 					write( 1, STUDENT_RECORD_MODIFIED, sizeof( STUDENT_RECORD_MODIFIED ) );
 					sleep( 1 );
 					write( clientSocket, ENROLL_COURSE_SUCCESSFUL_CLIENT,
@@ -402,6 +520,7 @@ void enroll_course( int clientSocket, int student_id )
 
 void view_all_courses( int clientSocket, int student_id )
 {
+	struct flock lock;
 	struct course record;
 	char* read_buffer = ( char* ) malloc( 512 * sizeof( char ) );
 	memset( read_buffer, 0, 512 );
@@ -410,11 +529,18 @@ void view_all_courses( int clientSocket, int student_id )
 		perror( COURSE_FILE_OPEN_FAILED );
 	else
 	{
+		lock.l_pid    = getpid();
+		lock.l_whence = SEEK_SET;
+		lock.l_start  = 0;
+		lock.l_type   = F_RDLCK;
+		lock.l_len    = 0;
+		fcntl( fileDescriptor, F_SETLKW, &lock );
+
 		int bytesToRead_course;
 		while( ( bytesToRead_course = read( fileDescriptor, &record, sizeof( struct course ) ) ) > 0 )
 		{
 			// We have reached the EOF
-			if( bytesToRead_course != sizeof( struct student ) ) { perror( COURSE_RECORD_EOF ); }
+			if( bytesToRead_course != sizeof( struct course ) ) { perror( COURSE_RECORD_EOF ); }
 
 			if( isStructEmpty( &record ) )
 				continue;
@@ -475,6 +601,8 @@ void view_all_courses( int clientSocket, int student_id )
 				memset( read_buffer, 0, 512 );
 			}
 		}
+		lock.l_type = F_UNLCK;
+		fcntl( fileDescriptor, F_SETLKW, &lock );
 	}
 	free( read_buffer );
 	close( fileDescriptor );
@@ -482,6 +610,8 @@ void view_all_courses( int clientSocket, int student_id )
 
 void change_password_student( int clientSocket, int student_id )
 {
+	struct flock lock;
+
 	struct student record;
 	char *password_buffer, *confirm_password_buffer;
 	password_buffer         = ( char* ) malloc( PASSWORD_LENGTH * sizeof( char ) );
@@ -511,8 +641,18 @@ void change_password_student( int clientSocket, int student_id )
 			confirm_password_buffer[read_student_password_confirm_bytes - 1] = '\0';
 			write( 1, confirm_password_buffer, strlen( confirm_password_buffer ) );
 
+			lock.l_pid    = getpid();
+			lock.l_whence = SEEK_SET;
+			lock.l_start  = ( student_id - 1 ) * sizeof( struct student );
+			lock.l_type   = F_RDLCK;
+			lock.l_len    = sizeof( struct student );
+			fcntl( fileDescriptor, F_SETLKW, &lock );
+
 			int retval =
 			          read_student_record( fileDescriptor, &record, student_id, sizeof( struct student ) );
+
+			lock.l_type = F_UNLCK;
+			fcntl( fileDescriptor, F_SETLKW, &lock );
 
 			if( !strcmp( password_buffer, confirm_password_buffer ) && retval == 1 )
 			{
@@ -527,7 +667,14 @@ void change_password_student( int clientSocket, int student_id )
 				memset( record.password, 0, PASSWORD_LENGTH );
 				strcpy( record.password, password_buffer );
 
+				lock.l_type = F_WRLCK;
+				fcntl( fileDescriptor, F_SETLKW, &lock );
+
 				write_student_record( fileDescriptor, &record, student_id, sizeof( student ), 1 );
+
+				lock.l_type = F_UNLCK;
+				fcntl( fileDescriptor, F_SETLKW, &lock );
+
 				break;
 			}
 			else
@@ -615,6 +762,7 @@ void logout_and_exit_student() { return; }
 
 void student_connection_handler( int clientSocket )
 {
+	struct flock lock;
 	loadVariablesFromFile();
 	char *username_buffer, *password_buffer;
 	struct student record;
@@ -648,6 +796,7 @@ void student_connection_handler( int clientSocket )
 			strcpy( temp_username_buffer, username_buffer + strlen( username_buffer ) - 4 );
 			student_id = atoi( temp_username_buffer );
 			free( temp_username_buffer );
+
 			if( student_id == 0 )
 			{
 				write( clientSocket, AUTHENTICATION_USERNAME_EMPTY,
@@ -655,9 +804,19 @@ void student_connection_handler( int clientSocket )
 			}
 			else
 			{
+				lock.l_pid    = getpid();
+				lock.l_whence = SEEK_SET;
+				lock.l_start  = ( student_id - 1 ) * sizeof( struct student );
+				lock.l_type   = F_RDLCK;
+				lock.l_len    = sizeof( struct student );
+				fcntl( fileDescriptor, F_SETLKW, &lock );
 
 				int retval = read_student_record( fileDescriptor, &record, student_id,
 				                                  sizeof( struct student ) );
+
+				lock.l_type = F_UNLCK;
+				fcntl( fileDescriptor, F_SETLKW, &lock );
+
 				if( retval == 1 )
 				{
 					if( record.status == 1 )

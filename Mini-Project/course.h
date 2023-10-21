@@ -11,7 +11,7 @@ struct course
 	int credits;
 	int total_number_of_seats;
 	int number_of_available_seats;
-	int status;
+	// int status;
 } course;
 
 #endif
