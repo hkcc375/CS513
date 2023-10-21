@@ -135,28 +135,56 @@ int isStructEmpty( const struct course* s )
 
 void saveVariablesToFile()
 {
+	struct flock lock;
+	lock.l_pid    = getpid();
+	lock.l_start  = 0;
+	lock.l_whence = SEEK_SET;
+	lock.l_len    = 0;
+	lock.l_type   = F_WRLCK;
+
 	int fileDescriptor = open( "globals.txt", O_CREAT | O_WRONLY, 0777 );
 	if( fileDescriptor == -1 )
 	{
 		perror( "Error opening file for writing" );
 		return;
 	}
+
+	fcntl( fileDescriptor, F_SETLKW, &lock );
+
 	write( fileDescriptor, &no_of_students, sizeof( int ) );
 	write( fileDescriptor, &no_of_faculty, sizeof( int ) );
 	write( fileDescriptor, &no_of_courses, sizeof( int ) );
+
+	lock.l_type = F_UNLCK;
+	fcntl( fileDescriptor, F_SETLKW, &lock );
+
 	close( fileDescriptor );
 }
 
 void loadVariablesFromFile()
 {
+	struct flock lock;
+	lock.l_pid    = getpid();
+	lock.l_start  = 0;
+	lock.l_whence = SEEK_SET;
+	lock.l_len    = 0;
+	lock.l_type   = F_RDLCK;
+
 	int fileDescriptor = open( "globals.txt", O_RDONLY );
 	if( fileDescriptor == -1 )
 	{
 		perror( "Error opening file for reading" );
 		return;
 	}
+
+	fcntl( fileDescriptor, F_SETLKW, &lock );
+
 	read( fileDescriptor, &no_of_students, sizeof( int ) );
 	read( fileDescriptor, &no_of_faculty, sizeof( int ) );
 	read( fileDescriptor, &no_of_courses, sizeof( int ) );
+
+	lock.l_type = F_UNLCK;
+	fcntl( fileDescriptor, F_SETLKW, &lock );
+
 	close( fileDescriptor );
 }
